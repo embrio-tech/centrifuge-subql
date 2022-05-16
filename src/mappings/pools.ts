@@ -59,12 +59,9 @@ async function _handlePoolCreated(event: SubstrateEvent): Promise<void> {
     tranche.poolId = pool.id
     tranche.trancheId = index
     tranche.isResidual = trancheData.trancheType.isResidual // only the first tranche is a residual tranche
-    tranche.seniority = Number(trancheData.seniority.toNumber())
+    tranche.seniority = trancheData.seniority.toNumber()
 
     if (!tranche.isResidual) {
-      logger.info(
-        `Tranche ${index} isResidual: ${tranche.isResidual}, ${JSON.stringify(trancheData.trancheType.asNonResidual)}`
-      )
       tranche.interestRatePerSec = trancheData.trancheType.asNonResidual.interestRatePerSec.toBigInt()
       tranche.minRiskBuffer = trancheData.trancheType.asNonResidual.minRiskBuffer.toBigInt()
     }
