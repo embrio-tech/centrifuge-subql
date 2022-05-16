@@ -18,13 +18,21 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
     // Populate State Updates
     const poolStates = await PoolState.getByType('ALL')
     poolStates.forEach(async (poolState) => {
-      const poolData = (<any>await api.query.pools.pool(poolState.id)).unwrap()
-      const navData = (<any>await api.query.loans.poolNAV(poolState.id)).unwrap()
+      const poolResponse = (<any>await api.query.pools.pool(poolState.id))
+      const navResponse = (<any>await api.query.loans.poolNAV(poolState.id))
 
-      poolState.netAssetValue = navData ? navData.latestNav.toBigInt() : BigInt(0)
-      poolState.totalReserve = poolData.reserve.total.toBigInt() ?? BigInt(0)
-      poolState.availableReserve = poolData.reserve.available.toBigInt() ?? BigInt(0)
-      poolState.maxReserve = poolData.reserve.max.toBigInt() ?? BigInt(0)
+      if (poolResponse.isSome) {
+        const poolData = poolResponse.unwrap()
+        poolState.totalReserve = poolData.reserve.total.toBigInt() ?? BigInt(0)
+        poolState.availableReserve = poolData.reserve.available.toBigInt() ?? BigInt(0)
+        poolState.maxReserve = poolData.reserve.max.toBigInt() ?? BigInt(0)
+      }
+
+      if (navResponse.isSome) {
+        const navData = navResponse.unwrap()
+        poolState.netAssetValue = navData.latestNav.toBigInt() : BigInt(0)
+        
+      }
 
       await poolState.save()
     })
