@@ -1,8 +1,8 @@
 import { SubstrateEvent } from '@subql/types'
-import { Option, TypeRegistry } from '@polkadot/types'
+import { Option } from '@polkadot/types'
 import { Epoch, Pool, PoolState, Tranche, TrancheState } from '../types'
 import { errorHandler } from '../helpers/errorHandler'
-import { PoolDetails, TrancheDetails } from 'centrifuge-subql/helpers/types'
+import { LoanEvent, PoolDetails, TrancheDetails } from 'centrifuge-subql/helpers/types'
 
 export const handlePoolCreated = errorHandler(_handlePoolCreated)
 async function _handlePoolCreated(event: SubstrateEvent): Promise<void> {
@@ -19,6 +19,13 @@ async function _handlePoolCreated(event: SubstrateEvent): Promise<void> {
   poolState.availableReserve = poolData.reserve.available.toBigInt()
   poolState.maxReserve = poolData.reserve.max.toBigInt()
   poolState.totalDebt = BigInt(0)
+
+  poolState.totalBorrowed_ = BigInt(0)
+  poolState.totalRepaid_ = BigInt(0)
+  poolState.totalInvested_ = BigInt(0)
+  poolState.totalRedeemed_ = BigInt(0)
+
+  poolState.totalEverBorrowed = BigInt(0)
 
   await poolState.save()
 
@@ -75,4 +82,17 @@ async function _handlePoolCreated(event: SubstrateEvent): Promise<void> {
       logger.error(error)
     }
   })
+}
+
+export const computeTotalBorrowings = errorHandler(_computeTotalBorrowings)
+async function _computeTotalBorrowings(event: SubstrateEvent): Promise<void> {
+  const [poolId, loanId, amount] = event.event.data as unknown as LoanEvent
+  const poolState = await PoolState.get(poolId.toString())
+
+  logger.info(`Pool: ${poolId.toString()} borrowed ${amount.toString()}`)
+
+  poolState.totalBorrowed_ = poolState.totalBorrowed_ + amount.toBigInt()
+  poolState.totalEverBorrowed = poolState.totalEverBorrowed + amount.toBigInt()
+
+  await poolState.save()
 }
