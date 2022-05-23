@@ -1,4 +1,5 @@
 import { SubstrateBlock } from '@subql/types'
+import { errorHandler } from './errorHandler'
 
 interface Constructor<C> {
   new (id: string): C
@@ -11,6 +12,7 @@ interface TypeGetter<C> {
 interface GenericState {
   id: string
   type: string
+  save(): Promise<void>
 }
 
 interface GenericSnapshot {
@@ -20,7 +22,8 @@ interface GenericSnapshot {
   save(): Promise<void>
 }
 
-export async function stateSnapshotter<
+export const stateSnapshotter = errorHandler(_stateSnapshotter)
+async function _stateSnapshotter<
   T extends Constructor<GenericState> & TypeGetter<GenericState>,
   U extends Constructor<GenericSnapshot>
 >(
@@ -29,18 +32,27 @@ export async function stateSnapshotter<
   block: SubstrateBlock,
   fkReferenceName: string = undefined
 ): Promise<Promise<void>[]> {
-  let newEntitySaves = []
+  let entitySaves = []
   if (!stateModel.hasOwnProperty('getByType')) throw new Error('stateModel has no method .hasOwnProperty()')
   const stateEntities = await stateModel.getByType('ALL')
-  stateEntities.forEach((stateEntity) => {
+  stateEntities.map((stateEntity) => {
     const blockHeight = block.block.header.number.toNumber()
     const { id, type, ...copyStateEntity } = stateEntity
     const snapshotEntity = new snapshotModel(`${id}-${blockHeight.toString()}`)
     Object.assign(snapshotEntity, copyStateEntity)
     snapshotEntity.timestamp = block.timestamp
     snapshotEntity.blockHeight = blockHeight
+
     if (fkReferenceName) snapshotEntity[fkReferenceName] = stateEntity.id
-    newEntitySaves.push(snapshotEntity.save())
+
+    const propNamesToReset = Object.getOwnPropertyNames(stateEntity).filter((propName) => propName.endsWith('_'))
+    for (const propName of propNamesToReset) {
+      logger.info(`Resetting entity: ${propName}`)
+      stateEntity[propName] = BigInt(0)
+    }
+
+    entitySaves.push(stateEntity.save())
+    entitySaves.push(snapshotEntity.save())
   })
-  return Promise.all(newEntitySaves)
+  return Promise.all(entitySaves)
 }
