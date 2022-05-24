@@ -46,9 +46,11 @@ type PoolState @entity {
   totalRepaid_: BigInt
   totalInvested_: BigInt
   totalRedeemed_: BigInt
+  totalNumberOfLoans_: BigInt
 
   # Cumulated transaction data since pool creation
   totalEverBorrowed: BigInt
+  totalEverNumberOfLoans: BigInt
 
   tranches: [Tranche] @derivedFrom(field: "pool")
 }
@@ -72,9 +74,11 @@ type PoolSnapshot @entity {
   totalRepaid_: BigInt
   totalInvested_: BigInt
   totalRedeemed_: BigInt
+  totalNumberOfLoans_: BigInt
 
   # Cumulated transaction data since pool creation
   totalEverBorrowed: BigInt
+  totalEverNumberOfLoans: BigInt
 }
 
 type Tranche @entity {
