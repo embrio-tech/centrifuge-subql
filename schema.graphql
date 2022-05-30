@@ -61,6 +61,7 @@ type PoolSnapshot @entity {
 
   timestamp: Date!
   blockNumber: Int!
+  periodStart: Date! @index
 
   #States
   netAssetValue: BigInt!
@@ -117,6 +118,7 @@ type TrancheSnapshot @entity {
 
   timestamp: Date!
   blockNumber: Int!
+  periodStart: Date! @index
 
   supply: BigInt
   price: Float
