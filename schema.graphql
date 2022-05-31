@@ -102,7 +102,7 @@ type TrancheState @entity {
   id: ID! #poolId-index
   type: String! @index
   supply: BigInt
-  price: Float
+  price: BigInt
 
   outstandingInvestOrders: BigInt
   outstandingRedeemOrders: BigInt
@@ -121,7 +121,7 @@ type TrancheSnapshot @entity {
   periodStart: Date! @index
 
   supply: BigInt
-  price: Float
+  price: BigInt
 
   outstandingInvestOrders: BigInt
   outstandingRedeemOrders: BigInt
