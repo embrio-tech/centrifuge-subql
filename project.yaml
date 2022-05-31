@@ -43,6 +43,16 @@ dataSources:
           filter:
             module: pools
             method: EpochExecuted
+        - handler: updateEpochReferences
+          kind: substrate/EventHandler
+          filter:
+            module: pools
+            method: EpochClosed
+        - handler: updateEpochReferences
+          kind: substrate/EventHandler
+          filter:
+            module: pools
+            method: EpochExecuted
         - handler: handleProxyAdded
           kind: substrate/EventHandler
           filter:
