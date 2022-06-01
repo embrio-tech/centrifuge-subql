@@ -1,6 +1,5 @@
-import { Option } from '@polkadot/types'
 import { SubstrateEvent, SubstrateBlock } from '@subql/types'
-import { EpochEvent, NavDetails, PoolDetails } from 'centrifuge-subql/helpers/types'
+import { EpochEvent } from 'centrifuge-subql/helpers/types'
 import { errorHandler } from '../helpers/errorHandler'
 import { Epoch, OutstandingOrder, PoolState, Tranche } from '../types'
 import { updateTranchePrice } from './tranches'
