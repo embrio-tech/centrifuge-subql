@@ -4,7 +4,8 @@ import { getPeriodStart, MemTimekeeper } from '../helpers/timeKeeping'
 import { errorHandler } from '../helpers/errorHandler'
 import { stateSnapshotter } from '../helpers/stateSnapshot'
 import { updatePoolNav, updatePoolState } from './pools'
-import { updateTranchePrice } from './tranches'
+import { computeTrancheYield, updateTranchePrice } from './tranches'
+import { SNAPSHOT_INTERVAL_SECONDS } from '../config'
 
 const memTimekeeper = initialiseMemTimekeeper()
 
@@ -16,6 +17,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
 
   if (newPeriod) {
     logger.info(`It's a new period on block ${blockNumber}: ${block.timestamp.toISOString()}`)
+    const lastPeriodStart = new Date(blockPeriodStart.valueOf() - SNAPSHOT_INTERVAL_SECONDS * 1000)
 
     // Update Pool States
     const pools = await Pool.getByType('ALL')
@@ -27,6 +29,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       const tranches = await Tranche.getByPoolId(pool.id)
       for (const tranche of tranches) {
         await updateTranchePrice(pool.id, tranche.trancheId, pool.currentEpoch)
+        await computeTrancheYield(pool.id, tranche.trancheId, lastPeriodStart)
       }
     }
 
