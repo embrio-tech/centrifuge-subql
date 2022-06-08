@@ -26,11 +26,13 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       await updatePoolNav(pool.id)
 
       // Update tranche states
+      const firstSnapshotDate = new Date(getPeriodStart(pool.createdAt).valueOf() + SNAPSHOT_INTERVAL_SECONDS * 1000)
       const tranches = await Tranche.getByPoolId(pool.id)
       for (const tranche of tranches) {
         await updateTranchePrice(pool.id, tranche.trancheId, pool.currentEpoch)
         await updateTrancheSupply(pool.id, tranche.trancheId)
-        await computeTrancheYield(pool.id, tranche.trancheId, lastPeriodStart)
+        await computeTrancheYield(pool.id, tranche.trancheId, 'yieldSinceLastPeriod', lastPeriodStart)
+        await computeTrancheYield(pool.id, tranche.trancheId, 'yieldSinceInception', firstSnapshotDate)
       }
     }
 

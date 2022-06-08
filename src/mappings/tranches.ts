@@ -65,7 +65,7 @@ async function _computeTrancheYield(
   yieldField: string,
   referencePeriodStart: Date
 ): Promise<TrancheState> {
-  logger.info(`Computing yield tranche ${trancheId} of pool ${poolId}`)
+  logger.info(`Computing yield for tranche ${trancheId} of pool ${poolId} with reference date ${referencePeriodStart}`)
   const trancheState = await TrancheState.get(`${poolId}-${trancheId}`)
   const trancheSnapshots = await TrancheSnapshot.getByPeriodStart(referencePeriodStart)
   if (!trancheSnapshots) return trancheState
@@ -73,7 +73,12 @@ async function _computeTrancheYield(
   if (!trancheSnapshot) return trancheState
   const priceCurrent = bnToBn(trancheState.price)
   const priceOld = bnToBn(trancheSnapshot.price)
-  trancheState[yieldField] = nToBigInt(priceCurrent.div(priceOld).sub(bnToBn(1)))
+  trancheState[yieldField] = nToBigInt(
+    priceCurrent
+      .mul(bnToBn(10).pow(bnToBn(27)))
+      .div(priceOld)
+      .sub(bnToBn(10).pow(bnToBn(27)))
+  )
   await trancheState.save()
   return trancheState
 }
