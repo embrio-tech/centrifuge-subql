@@ -84,11 +84,19 @@ export class TrancheService {
       `Computing yield for tranche ${this.tranche.trancheId} of pool ${this.tranche.poolId} with reference date ${referencePeriodStart}`
     )
     const trancheSnapshots = await TrancheSnapshot.getByPeriodStart(referencePeriodStart)
-    if (!trancheSnapshots) return this
+    if (trancheSnapshots.length === 0) {
+      logger.warn(`No tranche snapshot found pool ${this.tranche.poolId} with reference date ${referencePeriodStart}`)
+      return this
+    }
     const trancheSnapshot = trancheSnapshots.find(
       (snapshot) => snapshot.trancheId === `${this.tranche.poolId}-${this.tranche.trancheId}`
     )
-    if (trancheSnapshot === undefined) return this
+    if (trancheSnapshot === undefined) {
+      logger.warn(
+        `No tranche snapshot found tranche ${this.tranche.poolId}-${this.tranche.poolId} with reference date ${referencePeriodStart}`
+      )
+      return this
+    }
     const priceCurrent = bnToBn(this.trancheState.price)
     const priceOld = bnToBn(trancheSnapshot.price)
     this.trancheState[yieldField] = nToBigInt(
@@ -110,11 +118,19 @@ export class TrancheService {
       `Computing annualized yield for tranche ${this.tranche.trancheId} of pool ${this.tranche.poolId} with reference date ${referencePeriodStart}`
     )
     const trancheSnapshots = await TrancheSnapshot.getByPeriodStart(referencePeriodStart)
-    if (!trancheSnapshots) return this
+    if (trancheSnapshots.length === 0) {
+      logger.warn(`No tranche snapshot found pool ${this.tranche.poolId} with reference date ${referencePeriodStart}`)
+      return this
+    }
     const trancheSnapshot = trancheSnapshots.find(
       (snapshot) => snapshot.trancheId === `${this.tranche.poolId}-${this.tranche.trancheId}`
     )
-    if (trancheSnapshot === undefined) return this
+    if (trancheSnapshot === undefined) {
+      logger.warn(
+        `No tranche snapshot found tranche ${this.tranche.poolId}-${this.tranche.poolId} with reference date ${referencePeriodStart}`
+      )
+      return this
+    }
     const annualizationFactor = bnToBn(365 * 24 * 3600 * 1000).div(
       bnToBn(currentPeriodStart.valueOf() - referencePeriodStart.valueOf())
     )
