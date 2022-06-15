@@ -40,6 +40,16 @@ export class TrancheService {
     return new TrancheService(tranche, trancheState)
   }
 
+  static getByPoolId = async (poolId: string) => {
+    const tranches = await Tranche.getByPoolId(poolId)
+    const result: TrancheService[] = []
+    for (const tranche of tranches) {
+      const element = new TrancheService(tranche, await TrancheState.get(tranche.id))
+      result.push(element)
+    }
+    return result
+  }
+
   save = async () => {
     await this.trancheState.save()
     await this.tranche.save()
@@ -78,7 +88,7 @@ export class TrancheService {
     const trancheSnapshot = trancheSnapshots.find(
       (snapshot) => snapshot.trancheId === `${this.tranche.poolId}-${this.tranche.trancheId}`
     )
-    if (!trancheSnapshot) return this
+    if (trancheSnapshot === undefined) return this
     const priceCurrent = bnToBn(this.trancheState.price)
     const priceOld = bnToBn(trancheSnapshot.price)
     this.trancheState[yieldField] = nToBigInt(
@@ -104,7 +114,7 @@ export class TrancheService {
     const trancheSnapshot = trancheSnapshots.find(
       (snapshot) => snapshot.trancheId === `${this.tranche.poolId}-${this.tranche.trancheId}`
     )
-    if (!trancheSnapshot) return this
+    if (trancheSnapshot === undefined) return this
     const annualizationFactor = bnToBn(365 * 24 * 3600 * 1000).div(
       bnToBn(currentPeriodStart.valueOf() - referencePeriodStart.valueOf())
     )

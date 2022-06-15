@@ -1,6 +1,6 @@
 import { Option } from '@polkadot/types'
 import { errorHandler } from '../../helpers/errorHandler'
-import { NavDetails, PoolDetails, TrancheData, TrancheDetails } from '../../helpers/types'
+import { NavDetails, PoolDetails, TrancheData } from '../../helpers/types'
 import { Pool, PoolState } from '../../types'
 
 export class PoolService {
@@ -59,6 +59,16 @@ export class PoolService {
     const pool = await Pool.get(poolId)
     const poolState = await PoolState.get(poolId)
     return new PoolService(pool, poolState)
+  }
+
+  static getAll = async () => {
+    const pools = await Pool.getByType('ALL')
+    const result: PoolService[] = []
+    for (const pool of pools) {
+      const element = new PoolService(pool, await PoolState.get(pool.id))
+      result.push(element)
+    }
+    return result
   }
 
   save = async () => {
