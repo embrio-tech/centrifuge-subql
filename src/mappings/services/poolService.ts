@@ -58,6 +58,7 @@ export class PoolService {
   static getById = async (poolId: string) => {
     const pool = await Pool.get(poolId)
     const poolState = await PoolState.get(poolId)
+    if (pool === undefined || poolState === undefined) return undefined
     return new PoolService(pool, poolState)
   }
 
