@@ -138,6 +138,7 @@ async function _handleEpochExecuted(event: SubstrateEvent): Promise<void> {
         await it.save()
         await oo.updateUnfulfilledInvest(epochState.investFulfillment)
       }
+
       if (oo.outstandingOrder.redeem > BigInt(0)) {
         const it = InvestorTransactionService.executeRedeemOrder(
           ...orderData,
