@@ -4,8 +4,8 @@ import { EpochDetails } from '../../helpers/types'
 import { Epoch, EpochState } from '../../types'
 
 export class EpochService {
-  epoch: Epoch
-  epochStates: EpochState[]
+  readonly epoch: Epoch
+  readonly epochStates: EpochState[]
 
   constructor(epoch: Epoch, epochStates: EpochState[]) {
     this.epoch = epoch

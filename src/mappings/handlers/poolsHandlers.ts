@@ -133,6 +133,8 @@ async function _handleEpochExecuted(event: SubstrateEvent): Promise<void> {
           ...orderData,
           oo.outstandingOrder.invest,
           epochState.investFulfillment,
+          epochState.price,
+          BigInt(0), //TODO: Decorate transaction fee
           event.block.timestamp
         )
         await it.save()
@@ -144,6 +146,8 @@ async function _handleEpochExecuted(event: SubstrateEvent): Promise<void> {
           ...orderData,
           oo.outstandingOrder.redeem,
           epochState.redeemFulfillment,
+          epochState.price,
+          BigInt(0), //TODO: Decorate transaction fee
           event.block.timestamp
         )
         await it.save()

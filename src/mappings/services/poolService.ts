@@ -4,9 +4,9 @@ import { NavDetails, PoolDetails, TrancheData } from '../../helpers/types'
 import { Pool, PoolState } from '../../types'
 
 export class PoolService {
-  pool: Pool
-  poolState: PoolState
-  tranches: TrancheData | null
+  readonly pool: Pool
+  readonly poolState: PoolState
+  readonly tranches: TrancheData | null
 
   constructor(pool: Pool, poolState: PoolState, tranches: TrancheData = null) {
     this.pool = pool

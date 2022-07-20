@@ -2,7 +2,7 @@ import { bnToBn, nToBigInt } from '@polkadot/util'
 import { InvestorTransaction, InvestorTransactionType } from '../../types'
 
 export class InvestorTransactionService {
-  investorTransaction: InvestorTransaction
+  readonly investorTransaction: InvestorTransaction
 
   constructor(investorTransaction: InvestorTransaction) {
     this.investorTransaction = investorTransaction
@@ -42,9 +42,11 @@ export class InvestorTransactionService {
     hash: string,
     amount: bigint,
     fulfillmentRate: bigint,
+    price: bigint,
+    fee: bigint,
     timestamp: Date
   ) => {
-    return this.init(
+    const tx = this.init(
       poolId,
       trancheId,
       epochNumber,
@@ -58,6 +60,15 @@ export class InvestorTransactionService {
       ),
       timestamp
     )
+
+    tx.investorTransaction.tokenPrice = price
+    tx.investorTransaction.transactionFee = fee
+    tx.investorTransaction.tokenAmount = nToBigInt(
+      bnToBn(amount)
+        .mul(bnToBn(10).pow(bnToBn(18)))
+        .div(bnToBn(price))
+    )
+    return tx
   }
 
   static executeRedeemOrder = (
@@ -68,9 +79,11 @@ export class InvestorTransactionService {
     hash: string,
     amount: bigint,
     fulfillmentRate: bigint,
+    price: bigint,
+    fee: bigint,
     timestamp: Date
   ) => {
-    return this.init(
+    const tx = this.init(
       poolId,
       trancheId,
       epochNumber,
@@ -84,6 +97,15 @@ export class InvestorTransactionService {
       ),
       timestamp
     )
+
+    tx.investorTransaction.tokenPrice = price
+    tx.investorTransaction.transactionFee = fee
+    tx.investorTransaction.currencyAmount = nToBigInt(
+      bnToBn(amount)
+        .mul(bnToBn(price))
+        .div(bnToBn(10).pow(bnToBn(18)))
+    )
+    return tx
   }
 
   static updateInvestOrder = (

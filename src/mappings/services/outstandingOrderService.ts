@@ -2,7 +2,7 @@ import { bnToBn, nToBigInt } from '@polkadot/util'
 import { OutstandingOrder } from '../../types'
 
 export class OutstandingOrderService {
-  outstandingOrder: OutstandingOrder
+  readonly outstandingOrder: OutstandingOrder
 
   constructor(outstandingOrder: OutstandingOrder) {
     this.outstandingOrder = outstandingOrder

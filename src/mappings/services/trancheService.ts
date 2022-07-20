@@ -5,8 +5,8 @@ import { TrancheDetails } from '../../helpers/types'
 import { Tranche, TrancheSnapshot, TrancheState } from '../../types'
 
 export class TrancheService {
-  tranche: Tranche
-  trancheState: TrancheState
+  readonly tranche: Tranche
+  readonly trancheState: TrancheState
 
   constructor(tranche: Tranche, trancheState: TrancheState) {
     this.tranche = tranche
