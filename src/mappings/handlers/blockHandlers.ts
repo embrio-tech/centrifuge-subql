@@ -34,7 +34,10 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       )
       const tranches = await TrancheService.getByPoolId(pool.pool.id)
       for (const tranche of tranches) {
+        const trancheIndex = pool.tranches.ids.findIndex((trancheId) => tranche.tranche.trancheId === trancheId.toHex())
+        if (trancheIndex === -1) throw new Error(`Could not find TrancheDetails for tranche :${tranche.tranche.id}`)
         await tranche.updateSupply()
+        await tranche.updateDebt(pool.tranches.tranches[trancheIndex].debt.toBigInt())
         await tranche.computeYield('yieldSinceLastPeriod', lastPeriodStart)
         await tranche.computeYield('yieldSinceInception', firstSnapshotDate)
         await tranche.computeYieldAnnualized('yield30DaysAnnualized', blockPeriodStart, daysAgo30)

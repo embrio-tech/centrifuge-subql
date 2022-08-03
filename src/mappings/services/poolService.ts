@@ -6,7 +6,7 @@ import { Pool, PoolState } from '../../types'
 export class PoolService {
   readonly pool: Pool
   readonly poolState: PoolState
-  readonly tranches: TrancheData | null
+  tranches: TrancheData
 
   constructor(pool: Pool, poolState: PoolState, tranches: TrancheData = null) {
     this.pool = pool
@@ -85,6 +85,7 @@ export class PoolService {
       this.poolState.totalReserve = poolData.reserve.total.toBigInt()
       this.poolState.availableReserve = poolData.reserve.available.toBigInt()
       this.poolState.maxReserve = poolData.reserve.max.toBigInt()
+      this.tranches = poolData.tranches
     }
     return this
   }

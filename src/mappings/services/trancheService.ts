@@ -76,6 +76,11 @@ export class TrancheService {
     return this
   }
 
+  public updateDebt = (debt: bigint) => {
+    this.trancheState.debt = debt
+    return this
+  }
+
   private _computeYield = async (yieldField: string, referencePeriodStart: Date) => {
     logger.info(
       `Computing yield for tranche ${this.tranche.trancheId} of\
