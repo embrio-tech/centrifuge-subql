@@ -80,6 +80,7 @@ export class PoolService {
 
   private _updateState = async () => {
     const poolResponse = await api.query.pools.pool<Option<PoolDetails>>(this.pool.id)
+    logger.info(`Updating state for pool: ${this.pool.id} with data: ${JSON.stringify(poolResponse.toHuman())}`)
     if (poolResponse.isSome) {
       const poolData = poolResponse.unwrap()
       this.poolState.totalReserve = poolData.reserve.total.toBigInt()
