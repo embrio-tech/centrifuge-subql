@@ -110,14 +110,24 @@ export interface AssetMetadata extends Struct {
   existentialDeposit: u128
 }
 
-export type LoanAsset = ITuple<[u64, u128]>
+export interface LoanSpecs extends Struct {
+  advanceRate: u128
+  value: u128
+  probabilityOfDefault?: u128
+  lossGivenDefault?: u128
+  discountRate?: u128
+  maturityDate?: u64
+}
 
+export type LoanAsset = ITuple<[u64, u128]>
 export type PoolEvent = ITuple<[u64]>
 
 // poolId, loanId, collateral
 export type LoanCreatedClosedEvent = ITuple<[u64, u128, LoanAsset]>
 // poolId, loanId, amount
 export type LoanBorrowedEvent = ITuple<[u64, u128, u128]>
+//poolId, loanId, interestRatePerSec, loanType
+export type LoanPricedEvent = ITuple<[u64, u128, u128, Enum]>
 
 export type EpochEvent = ITuple<[u64, u32]>
 export type EpochSolutionEvent = ITuple<[u64, u32, EpochSolution]>

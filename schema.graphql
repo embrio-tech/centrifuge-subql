@@ -254,6 +254,9 @@ type Loan @entity {
   status: LoanStatus!
   # TODO: how to store loan type data
 
+  type: String
+  spec: String
+
   interestRatePerSec: BigInt
   outstandingDebt: BigInt
 

@@ -1,5 +1,5 @@
 import { SubstrateEvent } from '@subql/types'
-import { LoanBorrowedEvent, LoanCreatedClosedEvent } from '../../helpers/types'
+import { LoanBorrowedEvent, LoanCreatedClosedEvent, LoanPricedEvent, LoanSpecs } from '../../helpers/types'
 import { errorHandler } from '../../helpers/errorHandler'
 import { PoolService } from '../services/poolService'
 import { LoanService } from '../services/loanService'
@@ -27,4 +27,14 @@ async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedEvent>): Pr
   const poolService = await PoolService.getById(poolId.toString())
   await poolService.increaseTotalBorrowings(amount.toBigInt())
   await poolService.save()
+}
+
+export const handleLoanPriced = errorHandler(_handleLoanPriced)
+async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
+  const [poolId, loanId, interestRatePerSec, loanType] = event.event.data
+  logger.info(`Loan priced event for pool: ${poolId.toString()} loan: ${loanId.toString()}`)
+
+  const loan = await LoanService.getById(poolId.toString(), loanId.toString())
+  await loan.updateInterestRate(interestRatePerSec.toBigInt())
+  await loan.updateLoanType(loanType.type, loanType.toHuman(false))
 }

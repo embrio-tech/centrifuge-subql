@@ -1,4 +1,5 @@
-import { Loan } from '../../types'
+import { AnyJson } from '@polkadot/types/types'
+import { Loan, LoanStatus } from '../../types'
 
 export class LoanService {
   readonly loan: Loan
@@ -12,6 +13,7 @@ export class LoanService {
     const loan = new Loan(`${poolId}-${loanId}`)
 
     loan.createdAt = timestamp
+    loan.status = LoanStatus.CREATED
     loan.outstandingDebt = BigInt(0)
 
     return new LoanService(loan)
@@ -28,6 +30,18 @@ export class LoanService {
   }
 
   increaseOutstandingDebt = (amount: bigint) => {
+    logger.info(`Increasing outstanding debt for loan ${this.loan.id} by ${amount}`)
     this.loan.outstandingDebt = this.loan.outstandingDebt + amount
+  }
+
+  updateInterestRate = (interestRatePerSec: bigint) => {
+    this.loan.interestRatePerSec = interestRatePerSec
+  }
+
+  updateLoanType = (loanType: string, loanSpec: AnyJson) => {
+    this.loan.type = loanType
+
+    const specBuff = Buffer.from(JSON.stringify(loanSpec))
+    this.loan.spec = specBuff.toString('base64')
   }
 }
