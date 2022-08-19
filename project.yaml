@@ -73,7 +73,12 @@ dataSources:
           filter:
             module: proxy
             method: AnonymousCreated
-        - handler: handleBorrowings
+        - handler: handleLoanCreated
+          kind: substrate/EventHandler
+          filter:
+            module: loans
+            method: Created
+        - handler: handleLoanBorrowed
           kind: substrate/EventHandler
           filter:
             module: loans

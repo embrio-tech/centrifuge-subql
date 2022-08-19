@@ -12,7 +12,7 @@ export class LoanService {
     const loan = new Loan(`${poolId}-${loanId}`)
 
     loan.createdAt = timestamp
-    // init logic
+    loan.outstandingDebt = BigInt(0)
 
     return new LoanService(loan)
   }
@@ -25,5 +25,9 @@ export class LoanService {
 
   save = async () => {
     await this.loan.save()
+  }
+
+  increaseOutstandingDebt = (amount: bigint) => {
+    this.loan.outstandingDebt = this.loan.outstandingDebt + amount
   }
 }

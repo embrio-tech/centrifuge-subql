@@ -13,10 +13,17 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedClosedEvent>)
   await loan.save()
 }
 
-export const handleBorrowings = errorHandler(_handleBorrowings)
-async function _handleBorrowings(event: SubstrateEvent<LoanBorrowedEvent>): Promise<void> {
-  const [poolId, , amount] = event.event.data
+export const handleLoanBorrowed = errorHandler(_handleLoanBorrowed)
+async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedEvent>): Promise<void> {
+  const [poolId, loanId, amount] = event.event.data
   logger.info(`Pool: ${poolId.toString()} borrowed ${amount.toString()}`)
+
+  // Update loan amount
+  const loan = await LoanService.getById(poolId.toString(), loanId.toString())
+  await loan.increaseOutstandingDebt(amount.toBigInt())
+  await loan.save()
+
+  // Update poolState info
   const poolService = await PoolService.getById(poolId.toString())
   await poolService.increaseTotalBorrowings(amount.toBigInt())
   await poolService.save()
