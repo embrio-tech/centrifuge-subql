@@ -7,9 +7,9 @@ export class LoanService {
     this.loan = loan
   }
 
-  static init = async (poolId: string, loanId: number, timestamp: Date) => {
+  static init = async (poolId: string, loanId: string, timestamp: Date) => {
     logger.info(`Initialising loan ${loanId} for pool ${poolId}`)
-    const loan = new Loan(`${poolId}-${loanId.toString()}`)
+    const loan = new Loan(`${poolId}-${loanId}`)
 
     loan.createdAt = timestamp
     // init logic
@@ -17,8 +17,8 @@ export class LoanService {
     return new LoanService(loan)
   }
 
-  static getById = async (loanId: string) => {
-    const loan = await Loan.get(loanId)
+  static getById = async (poolId: string, loanId: string) => {
+    const loan = await Loan.get(`${poolId}-${loanId}`)
     if (loan === undefined) return undefined
     return new LoanService(loan)
   }
