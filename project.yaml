@@ -22,6 +22,7 @@ dataSources:
   - kind: substrate/Runtime
     startBlock: 1
     mapping:
+
       file: ./dist/index.js
       handlers:
         - handler: handleBlock
