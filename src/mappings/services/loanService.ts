@@ -26,23 +26,29 @@ export class LoanService {
     return new LoanService(loan)
   }
 
-  save = async () => {
+  public save = async () => {
     await this.loan.save()
   }
 
-  increaseOutstandingDebt = (amount: bigint) => {
+  public increaseOutstandingDebt = (amount: bigint) => {
     logger.info(`Increasing outstanding debt for loan ${this.loan.id} by ${amount}`)
     this.loan.outstandingDebt = this.loan.outstandingDebt + amount
   }
 
-  updateInterestRate = (interestRatePerSec: bigint) => {
+  public updateInterestRate = (interestRatePerSec: bigint) => {
+    logger.info(`Updating interest rate for loan ${this.loan.id} to ${interestRatePerSec}`)
     this.loan.interestRatePerSec = interestRatePerSec
   }
 
-  updateLoanType = (loanType: string, loanSpec?: AnyJson) => {
+  public updateLoanType = (loanType: string, loanSpec?: AnyJson) => {
+    logger.info(`Updating loan type for loan ${this.loan.id} to ${loanType}`)
     this.loan.type = loanType
-
     const specBuff = Buffer.from(JSON.stringify(loanSpec))
     this.loan.spec = specBuff.toString('base64')
+  }
+
+  public activate = () => {
+    logger.info(`Activating loan ${this.loan.id}`)
+    this.loan.status = LoanStatus.ACTIVE
   }
 }
