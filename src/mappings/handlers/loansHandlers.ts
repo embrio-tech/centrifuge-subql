@@ -36,5 +36,6 @@ async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
 
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.updateInterestRate(interestRatePerSec.toBigInt())
-  await loan.updateLoanType(loanType.type, loanType.toHuman(false))
+  await loan.updateLoanType(loanType.type, loanType.inner.toJSON())
+  await loan.save()
 }

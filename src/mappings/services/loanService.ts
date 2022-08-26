@@ -13,6 +13,7 @@ export class LoanService {
     const loan = new Loan(`${poolId}-${loanId}`)
 
     loan.createdAt = timestamp
+    loan.poolId = poolId
     loan.status = LoanStatus.CREATED
     loan.outstandingDebt = BigInt(0)
 
@@ -38,7 +39,7 @@ export class LoanService {
     this.loan.interestRatePerSec = interestRatePerSec
   }
 
-  updateLoanType = (loanType: string, loanSpec: AnyJson) => {
+  updateLoanType = (loanType: string, loanSpec?: AnyJson) => {
     this.loan.type = loanType
 
     const specBuff = Buffer.from(JSON.stringify(loanSpec))
