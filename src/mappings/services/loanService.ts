@@ -1,4 +1,6 @@
 import { AnyJson } from '@polkadot/types/types'
+import { bnToBn, nToBigInt } from '@polkadot/util'
+import { WAD } from 'centrifuge-subql/config'
 import { Loan, LoanStatus } from '../../types'
 
 export class LoanService {
@@ -35,9 +37,20 @@ export class LoanService {
     this.loan.outstandingDebt = this.loan.outstandingDebt + amount
   }
 
+  public decreaseOutstandingDebt = (amount: bigint) => {
+    logger.info(`Decreasing outstanding debt for loan ${this.loan.id} by ${amount}`)
+    this.loan.outstandingDebt = this.loan.outstandingDebt - amount
+  }
+
   public updateInterestRate = (interestRatePerSec: bigint) => {
     logger.info(`Updating interest rate for loan ${this.loan.id} to ${interestRatePerSec}`)
     this.loan.interestRatePerSec = interestRatePerSec
+  }
+
+  public writeOff = (percentage: bigint, writeOffIndex: number) => {
+    logger.info(`Writing off loan ${this.loan.id} with ${percentage}`)
+    this.loan.outstandingDebt = nToBigInt(bnToBn(this.loan.outstandingDebt).mul(bnToBn(percentage).div(WAD)))
+    this.loan.writeOffIndex = writeOffIndex
   }
 
   public updateLoanType = (loanType: string, loanSpec?: AnyJson) => {

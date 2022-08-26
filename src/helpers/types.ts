@@ -127,9 +127,11 @@ export type PoolEvent = ITuple<[u64]>
 // poolId, loanId, collateral
 export type LoanCreatedClosedEvent = ITuple<[u64, u128, LoanAsset]>
 // poolId, loanId, amount
-export type LoanBorrowedEvent = ITuple<[u64, u128, u128]>
+export type LoanBorrowedRepaidEvent = ITuple<[u64, u128, u128]>
 //poolId, loanId, interestRatePerSec, loanType
 export type LoanPricedEvent = ITuple<[u64, u128, u128, Enum]>
+//poolId, loanId, percentage, penaltyInterestRatePerSec, writeOffGroupIndex
+export type LoanWrittenOffEvent = ITuple<[u64, u128, u128, u128, Option<u32>]>
 
 export type EpochEvent = ITuple<[u64, u32]>
 export type EpochSolutionEvent = ITuple<[u64, u32, EpochSolution]>

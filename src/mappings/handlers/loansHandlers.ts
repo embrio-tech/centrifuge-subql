@@ -1,5 +1,10 @@
 import { SubstrateEvent } from '@subql/types'
-import { LoanBorrowedEvent, LoanCreatedClosedEvent, LoanPricedEvent } from '../../helpers/types'
+import {
+  LoanBorrowedRepaidEvent,
+  LoanCreatedClosedEvent,
+  LoanPricedEvent,
+  LoanWrittenOffEvent,
+} from '../../helpers/types'
 import { errorHandler } from '../../helpers/errorHandler'
 import { PoolService } from '../services/poolService'
 import { LoanService } from '../services/loanService'
@@ -14,7 +19,7 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedClosedEvent>)
 }
 
 export const handleLoanBorrowed = errorHandler(_handleLoanBorrowed)
-async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedEvent>): Promise<void> {
+async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedRepaidEvent>): Promise<void> {
   const [poolId, loanId, amount] = event.event.data
   logger.info(`Loan borrowed event for pool: ${poolId.toString()} amount: ${amount.toString()}`)
 
@@ -37,5 +42,24 @@ async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
   await loan.activate()
   await loan.updateInterestRate(interestRatePerSec.toBigInt())
   await loan.updateLoanType(loanType.type, loanType.inner.toJSON())
+  await loan.save()
+}
+
+export const handleLoanRepaid = errorHandler(_handleLoanRepaid)
+async function _handleLoanRepaid(event: SubstrateEvent<LoanBorrowedRepaidEvent>) {
+  const [poolId, loanId, amount] = event.event.data
+  logger.info(`Loan borrowed event for pool: ${poolId.toString()} amount: ${amount.toString()}`)
+  const loan = await LoanService.getById(poolId.toString(), loanId.toString())
+  await loan.decreaseOutstandingDebt(amount.toBigInt())
+  await loan.save()
+}
+
+export const handleLoanWrittenOff = errorHandler(_handleLoanWrittenOff)
+async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>) {
+  const [poolId, loanId, percentage, , writeOffGroupIndex] = event.event.data
+  logger.info(`Loan writtenoff event for pool: ${poolId.toString()} loanId: ${loanId.toString()}`)
+  const loan = await LoanService.getById(poolId.toString(), loanId.toString())
+  const writeOffIndex = writeOffGroupIndex.isSome ? writeOffGroupIndex.unwrap().toNumber() : null
+  await loan.writeOff(percentage.toBigInt(), writeOffIndex)
   await loan.save()
 }

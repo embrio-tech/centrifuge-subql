@@ -88,6 +88,11 @@ dataSources:
           filter:
             module: loans
             method: Priced
+        - handler: handleLoanRepaid
+          kind: substrate/EventHandler
+          filter:
+            module: loans
+            method: Repaid
         - handler: handleTokenTransfer
           kind: substrate/EventHandler
           filter:
