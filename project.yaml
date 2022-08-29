@@ -93,6 +93,11 @@ dataSources:
           filter:
             module: loans
             method: Repaid
+        - handler: handleLoanClosed
+          kind: substrate/EventHandler
+          filter:
+            module: loans
+            method: Closed
         - handler: handleTokenTransfer
           kind: substrate/EventHandler
           filter:

@@ -1,6 +1,4 @@
 import { AnyJson } from '@polkadot/types/types'
-import { bnToBn, nToBigInt } from '@polkadot/util'
-import { WAD } from 'centrifuge-subql/config'
 import { Loan, LoanStatus } from '../../types'
 
 export class LoanService {
@@ -18,6 +16,8 @@ export class LoanService {
     loan.poolId = poolId
     loan.status = LoanStatus.CREATED
     loan.outstandingDebt = BigInt(0)
+    loan.totalBorrowed = BigInt(0)
+    loan.totalRepaid = BigInt(0)
 
     return new LoanService(loan)
   }
@@ -32,14 +32,14 @@ export class LoanService {
     await this.loan.save()
   }
 
-  public increaseOutstandingDebt = (amount: bigint) => {
+  public borrow = (amount: bigint) => {
     logger.info(`Increasing outstanding debt for loan ${this.loan.id} by ${amount}`)
-    this.loan.outstandingDebt = this.loan.outstandingDebt + amount
+    this.loan.totalBorrowed = this.loan.totalBorrowed + amount
   }
 
-  public decreaseOutstandingDebt = (amount: bigint) => {
+  public repay = (amount: bigint) => {
     logger.info(`Decreasing outstanding debt for loan ${this.loan.id} by ${amount}`)
-    this.loan.outstandingDebt = this.loan.outstandingDebt - amount
+    this.loan.outstandingDebt = this.loan.totalRepaid + amount
   }
 
   public updateInterestRate = (interestRatePerSec: bigint) => {
@@ -47,9 +47,10 @@ export class LoanService {
     this.loan.interestRatePerSec = interestRatePerSec
   }
 
-  public writeOff = (percentage: bigint, writeOffIndex: number) => {
+  public writeOff = (percentage: bigint, penaltyInterestRatePerSec: bigint, writeOffIndex: number) => {
     logger.info(`Writing off loan ${this.loan.id} with ${percentage}`)
-    this.loan.outstandingDebt = nToBigInt(bnToBn(this.loan.outstandingDebt).mul(bnToBn(percentage).div(WAD)))
+    this.loan.writtenOffPercentage = percentage
+    this.loan.penaltyInterestRatePerSec = penaltyInterestRatePerSec
     this.loan.writeOffIndex = writeOffIndex
   }
 
@@ -63,5 +64,10 @@ export class LoanService {
   public activate = () => {
     logger.info(`Activating loan ${this.loan.id}`)
     this.loan.status = LoanStatus.ACTIVE
+  }
+
+  public close = () => {
+    logger.info(`Closing loan ${this.loan.id}`)
+    this.loan.status = LoanStatus.CLOSED
   }
 }

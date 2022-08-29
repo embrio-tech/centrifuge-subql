@@ -25,7 +25,7 @@ async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedRepaidEvent
 
   // Update loan amount
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
-  await loan.increaseOutstandingDebt(amount.toBigInt())
+  await loan.borrow(amount.toBigInt())
   await loan.save()
 
   // Update poolState info
@@ -50,16 +50,25 @@ async function _handleLoanRepaid(event: SubstrateEvent<LoanBorrowedRepaidEvent>)
   const [poolId, loanId, amount] = event.event.data
   logger.info(`Loan borrowed event for pool: ${poolId.toString()} amount: ${amount.toString()}`)
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
-  await loan.decreaseOutstandingDebt(amount.toBigInt())
+  await loan.repay(amount.toBigInt())
   await loan.save()
 }
 
 export const handleLoanWrittenOff = errorHandler(_handleLoanWrittenOff)
 async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>) {
-  const [poolId, loanId, percentage, , writeOffGroupIndex] = event.event.data
+  const [poolId, loanId, percentage, penaltyInterestRatePerSec, writeOffGroupIndex] = event.event.data
   logger.info(`Loan writtenoff event for pool: ${poolId.toString()} loanId: ${loanId.toString()}`)
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   const writeOffIndex = writeOffGroupIndex.isSome ? writeOffGroupIndex.unwrap().toNumber() : null
-  await loan.writeOff(percentage.toBigInt(), writeOffIndex)
+  await loan.writeOff(percentage.toBigInt(), penaltyInterestRatePerSec.toBigInt(), writeOffIndex)
+  await loan.save()
+}
+
+export const handleLoanClosed = errorHandler(_handleLoanClosed)
+async function _handleLoanClosed(event: SubstrateEvent<LoanCreatedClosedEvent>) {
+  const [poolId, loanId] = event.event.data
+  logger.info(`Loan closed event for pool: ${poolId.toString()} loanId: ${loanId.toString()}`)
+  const loan = await LoanService.getById(poolId.toString(), loanId.toString())
+  await loan.close()
   await loan.save()
 }
