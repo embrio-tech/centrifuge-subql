@@ -110,11 +110,9 @@ export class EpochService {
   }
 
   private computeCurrencyAmount = (amount: bigint, price: bigint, digits: number) =>
-    price
-      ? nToBigInt(
-          bnToBn(amount)
-            .mul(bnToBn(price))
-            .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
-        )
-      : null
+    nToBigInt(
+      bnToBn(amount)
+        .mul(bnToBn(price))
+        .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
+    )
 }

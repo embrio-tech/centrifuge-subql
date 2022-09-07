@@ -197,11 +197,9 @@ export class TrancheService {
   }
 
   private computeCurrencyAmount = (amount: bigint, digits: number) =>
-    this.trancheState.price
-      ? nToBigInt(
-          bnToBn(amount)
-            .mul(bnToBn(this.trancheState.price))
-            .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
-        )
-      : null
+    nToBigInt(
+      bnToBn(amount)
+        .mul(bnToBn(this.trancheState.price))
+        .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
+    )
 }
