@@ -86,7 +86,8 @@ export class TrancheService {
     const poolId = new u64(api.registry, this.tranche.poolId)
     const tokenPrices = await (api.rpc as ExtendedRpc).pools.trancheTokenPrices(poolId)
     const trancheTokenPrice = tokenPrices[this.tranche.index].toBigInt()
-    if (trancheTokenPrice <= BigInt(0)) logger.error(`Zero or negative price returned for tranche: ${this.tranche.id}`)
+    if (trancheTokenPrice <= BigInt(0))
+      throw new Error(`Zero or negative price returned for tranche: ${this.tranche.id}`)
     this.updatePrice(trancheTokenPrice)
     return this
   }
