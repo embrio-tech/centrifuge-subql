@@ -242,6 +242,7 @@ type Account @entity {
 
   outstandingOrders: [OutstandingOrder] @derivedFrom(field: "account")
   trancheBalances: [TrancheBalance] @derivedFrom(field: "account")
+  currencyBalances: [CurrencyBalance] @derivedFrom(field: "account")
 }
 
 type TrancheBalance @entity {
@@ -257,6 +258,14 @@ type TrancheBalance @entity {
   redeemOrdered: BigInt!
   redeemUncollected: BigInt!
   redeemCollected: BigInt!
+}
+
+type CurrencyBalance @entity {
+  id: ID! # address - currencyId
+  account: Account @index
+
+  currency: Currency!
+  amount: BigInt!
 }
 
 # enum LoanStatus {
