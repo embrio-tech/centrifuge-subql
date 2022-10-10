@@ -103,3 +103,18 @@ dataSources:
           filter:
             module: ormlTokens
             method: Transfer
+        - handler: handleTokenEndowed
+          kind: substrate/EventHandler
+          filter:
+            module: ormlTokens
+            method: Endowed
+        - handler: handleTokenDeposited
+          kind: substrate/EventHandler
+          filter:
+            module: ormlTokens
+            method: Deposited
+        - handler: handleTokenWithdrawn
+          kind: substrate/EventHandler
+          filter:
+            module: ormlTokens
+            method: Withdrawn

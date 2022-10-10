@@ -262,7 +262,7 @@ type TrancheBalance @entity {
 
 type CurrencyBalance @entity {
   id: ID! # address - currencyId
-  account: Account @index
+  account: Account! @index
 
   currency: Currency!
   amount: BigInt!
