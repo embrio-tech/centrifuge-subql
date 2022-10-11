@@ -1,5 +1,6 @@
 import { u128, u64 } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
+import { paginatedGetter } from '../../helpers/paginatedGetter'
 import { CPREC, RAY, RAY_DIGITS, WAD_DIGITS } from '../../config'
 import { errorHandler } from '../../helpers/errorHandler'
 import { ExtendedRpc, TrancheDetails } from '../../helpers/types'
@@ -52,7 +53,7 @@ export class TrancheService {
   }
 
   static getByPoolId = async (poolId: string) => {
-    const tranches = await Tranche.getByPoolId(poolId)
+    const tranches = (await paginatedGetter('Tranche', 'poolId', poolId)) as Tranche[]
     const result: TrancheService[] = []
     for (const tranche of tranches) {
       const element = new TrancheService(tranche, await TrancheState.get(tranche.id))
