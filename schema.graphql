@@ -33,6 +33,7 @@ type Pool @entity {
 type PoolState @entity {
   id: ID! #poolId
   type: String! @index
+
   #States
   netAssetValue: BigInt!
   totalReserve: BigInt!
@@ -47,6 +48,8 @@ type PoolState @entity {
   totalInvested_: BigInt
   totalRedeemed_: BigInt
   totalNumberOfLoans_: BigInt
+
+  totalNumberOfActiveLoans: BigInt!
 
   # Cumulated transaction data since pool creation
   totalEverBorrowed: BigInt
@@ -74,7 +77,11 @@ type PoolSnapshot @entity {
   # Aggregated transaction data over the last period
   totalBorrowed_: BigInt
   totalRepaid_: BigInt
+  totalInvested_: BigInt
+  totalRedeemed_: BigInt
   totalNumberOfLoans_: BigInt
+
+  totalNumberOfActiveLoans: BigInt!
 
   # Cumulated transaction data since pool creation
   totalEverBorrowed: BigInt
@@ -100,6 +107,7 @@ type Tranche @entity {
 type TrancheState @entity {
   id: ID! #poolId-trancheId
   type: String! @index
+  active: Boolean! @index
 
   supply: BigInt
   price: BigInt
@@ -160,7 +168,6 @@ type Epoch @entity {
   totalRepaid: BigInt!
   totalInvested: BigInt!
   totalRedeemed: BigInt!
-  totalRedeemedCurrency: BigInt!
 
   epochStates: [EpochState] @derivedFrom(field: "epoch")
 
@@ -275,6 +282,7 @@ type Loan @entity {
   createdAt: Date!
 
   collateral: BigInt!
+  maturityDate: Date
 
   type: LoanType
   spec: String

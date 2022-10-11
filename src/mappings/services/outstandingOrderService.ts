@@ -38,7 +38,7 @@ export class OutstandingOrderService {
       'trancheId',
       `${poolId}-${trancheId}`
     )) as OutstandingOrder[]
-    return entities.map((entity) => new OutstandingOrderService(entity))
+    return entities.map((ooEntity) => new OutstandingOrderService(OutstandingOrder.create(ooEntity)))
   }
 
   save = async () => {

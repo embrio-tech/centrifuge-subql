@@ -15,10 +15,10 @@ export class TrancheService {
     this.trancheState = trancheState
   }
 
-  static init = async (poolId: string, trancheId: string, index: number, trancheData: TrancheDetails) => {
+  static init = (poolId: string, trancheId: string, index: number, trancheData: TrancheDetails) => {
     const trancheState = new TrancheState(`${poolId}-${trancheId}`)
     trancheState.type = 'ALL'
-
+    trancheState.active = true
     trancheState.outstandingInvestOrders_ = BigInt(0)
     trancheState.outstandingRedeemOrders_ = BigInt(0)
     trancheState.outstandingRedeemOrdersCurrency_ = BigInt(0)
@@ -52,11 +52,33 @@ export class TrancheService {
     return new TrancheService(tranche, trancheState)
   }
 
+  static getOrInit = async (poolId: string, trancheId: string, index: number, trancheData: TrancheDetails) => {
+    let tranche = await this.getById(poolId, trancheId)
+    if (tranche === undefined) {
+      tranche = this.init(poolId, trancheId, index, trancheData)
+      await tranche.save()
+    }
+    return tranche
+  }
+
   static getByPoolId = async (poolId: string) => {
     const tranches = (await paginatedGetter('Tranche', 'poolId', poolId)) as Tranche[]
     const result: TrancheService[] = []
     for (const tranche of tranches) {
-      const element = new TrancheService(tranche, await TrancheState.get(tranche.id))
+      const element = new TrancheService(Tranche.create(tranche), await TrancheState.get(tranche.id))
+      result.push(element)
+    }
+    return result
+  }
+
+  static getActives = async (poolId: string) => {
+    const tranches = await Tranche.getByPoolId(poolId)
+    const ids = tranches.map((tranche) => tranche.id)
+    const states = await Promise.all(ids.map((id) => TrancheState.get(id)))
+    const activeStates = states.filter((state) => state.active === true)
+    const result: TrancheService[] = []
+    for (const trancheState of activeStates) {
+      const element = new TrancheService(await Tranche.get(trancheState.id), trancheState)
       result.push(element)
     }
     return result
@@ -195,8 +217,12 @@ export class TrancheService {
     return this
   }
 
-  public updateFulfilledRedeemOrders = (amount: bigint) => {
+  public updateFulfilledRedeemOrders = (amount: bigint, digits: number) => {
     this.trancheState.fulfilledRedeemOrders_ = this.trancheState.fulfilledRedeemOrders_ + amount
+    this.trancheState.fulfilledRedeemOrdersCurrency_ = this.computeCurrencyAmount(
+      this.trancheState.fulfilledRedeemOrders_,
+      digits
+    )
     return this
   }
 
@@ -206,4 +232,12 @@ export class TrancheService {
         .mul(bnToBn(this.trancheState.price))
         .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
     )
+
+  public deactivate = () => {
+    this.trancheState.active = false
+  }
+
+  public activate = () => {
+    this.trancheState.active = true
+  }
 }

@@ -27,20 +27,16 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       await pool.updateState()
       await pool.updateNav()
       await pool.computePoolValue()
-      await pool.save()
-
-      const { ids, tranches: trancheData } = pool.tranches
-      const tokenPrices = await pool.getTrancheTokenPrices()
 
       // Update tranche states
-      const trancheIds = ids.map((id) => id.toHex())
-      const tranches = await TrancheService.getByPoolId(pool.pool.id)
+      const tranches = await TrancheService.getActives(pool.pool.id)
+      const trancheData = await pool.getTranches()
+      const trancheTokenPrices = await pool.getTrancheTokenPrices()
       for (const tranche of tranches) {
-        const trancheIndex = trancheIds.findIndex((trancheId) => tranche.tranche.trancheId === trancheId)
-        if (trancheIndex === -1) throw new Error(`Could not find TrancheDetails for tranche :${tranche.tranche.id}`)
-        if (tokenPrices !== undefined) await tranche.updatePrice(tokenPrices[trancheIndex].toBigInt())
+        const index = tranche.tranche.index
+        if (trancheTokenPrices !== undefined) await tranche.updatePrice(trancheTokenPrices[index].toBigInt())
         await tranche.updateSupply()
-        await tranche.updateDebt(trancheData[trancheIndex].debt.toBigInt())
+        await tranche.updateDebt(trancheData[tranche.tranche.trancheId].data.debt.toBigInt())
         await tranche.computeYield('yieldSinceLastPeriod', lastPeriodStart)
         await tranche.computeYield('yieldSinceInception')
         await tranche.computeYieldAnnualized('yield30DaysAnnualized', blockPeriodStart, daysAgo30)
@@ -56,11 +52,14 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
         await loan.updateOutstandingDebt(normalizedDebt, interestRate)
         await loan.save()
       }
+
+      await pool.updateTotalNumberOfActiveLoans(BigInt(Object.keys(activeLoanData).length))
+      await pool.save()
     }
 
     //Perform Snapshots and reset accumulators
     await stateSnapshotter('PoolState', 'PoolSnapshot', block, 'poolId')
-    await stateSnapshotter('TrancheState', 'TrancheSnapshot', block, 'trancheId')
+    await stateSnapshotter('TrancheState', 'TrancheSnapshot', block, 'trancheId', 'active', true)
     await stateSnapshotter('LoanState', 'LoanSnapshot', block, 'loanId', 'status', 'ACTIVE')
 
     //Update tracking of period and continue

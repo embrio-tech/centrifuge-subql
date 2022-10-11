@@ -21,7 +21,7 @@ async function _stateSnapshotter(
   block: SubstrateBlock,
   fkReferenceName: string = undefined,
   filterKey = 'type',
-  filterValue = 'ALL'
+  filterValue: string | boolean = 'ALL'
 ): Promise<void> {
   const entitySaves: Promise<void>[] = []
   logger.info(`Performing snapshots of ${stateModel}`)
