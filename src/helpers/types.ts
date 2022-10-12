@@ -139,6 +139,12 @@ export interface InterestAccrualRateDetails extends Struct {
   lastUpdated: u64
 }
 
+export interface AccountData extends Struct {
+  free: u128
+  reserved: u128
+  frozen: u128
+}
+
 export type LoanAsset = ITuple<[u64, u128]>
 
 // poolId

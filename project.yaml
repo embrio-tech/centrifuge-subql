@@ -15,7 +15,7 @@ schema:
 network:
   endpoint: wss://fullnode.development.cntrfg.com
   genesisHash: '0x2c33566932add70371a14fded47c139e9bc04412e53216e16978fa1e9e122c56'
-  dictionary: ''
+#  dictionary: ''
   chaintypes:
     file: ./dist/chaintypes.js
 dataSources:
