@@ -1,5 +1,6 @@
 import { Option, u128, u64, Vec } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
+import { paginatedGetter } from '../../helpers/paginatedGetter'
 import { errorHandler } from '../../helpers/errorHandler'
 import { ExtendedRpc, NavDetails, PoolDetails, PricedLoanDetails, TrancheDetails } from '../../helpers/types'
 import { Pool, PoolState } from '../../types'
@@ -29,6 +30,7 @@ export class PoolService {
     poolState.totalInvested_ = BigInt(0)
     poolState.totalRedeemed_ = BigInt(0)
     poolState.totalNumberOfLoans_ = BigInt(0)
+    poolState.totalNumberOfActiveLoans = BigInt(0)
 
     poolState.totalEverBorrowed = BigInt(0)
     poolState.totalEverNumberOfLoans = BigInt(0)
@@ -67,10 +69,10 @@ export class PoolService {
   }
 
   static getAll = async () => {
-    const pools = await Pool.getByType('ALL')
+    const pools = (await paginatedGetter('Pool', 'type', 'ALL')) as Pool[]
     const result: PoolService[] = []
     for (const pool of pools) {
-      const element = new PoolService(pool, await PoolState.get(pool.id))
+      const element = new PoolService(Pool.create(pool), await PoolState.get(pool.id))
       result.push(element)
     }
     return result
@@ -105,11 +107,23 @@ export class PoolService {
   }
   public updateNav = errorHandler(this._updateNav)
 
+  public updateTotalNumberOfActiveLoans = (activeLoans: bigint) => {
+    this.poolState.totalNumberOfActiveLoans = activeLoans
+  }
+
   public increaseTotalBorrowings = (borrowedAmount: bigint) => {
     this.poolState.totalBorrowed_ = this.poolState.totalBorrowed_ + borrowedAmount
     this.poolState.totalEverBorrowed = this.poolState.totalEverBorrowed + borrowedAmount
     this.poolState.totalNumberOfLoans_ = this.poolState.totalNumberOfLoans_ + BigInt(1)
     this.poolState.totalEverNumberOfLoans = this.poolState.totalEverNumberOfLoans + BigInt(1)
+  }
+
+  public increaseTotalInvested = (currencyAmount: bigint) => {
+    this.poolState.totalInvested_ += currencyAmount
+  }
+
+  public increaseTotalRedeemed = (currencyAmount: bigint) => {
+    this.poolState.totalRedeemed_ += currencyAmount
   }
 
   public closeEpoch = (epochId: number) => {
