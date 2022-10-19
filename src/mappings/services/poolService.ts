@@ -112,10 +112,10 @@ export class PoolService {
   }
 
   public increaseTotalBorrowings = (borrowedAmount: bigint) => {
-    this.poolState.totalBorrowed_ = this.poolState.totalBorrowed_ + borrowedAmount
-    this.poolState.totalEverBorrowed = this.poolState.totalEverBorrowed + borrowedAmount
-    this.poolState.totalNumberOfLoans_ = this.poolState.totalNumberOfLoans_ + BigInt(1)
-    this.poolState.totalEverNumberOfLoans = this.poolState.totalEverNumberOfLoans + BigInt(1)
+    this.poolState.totalBorrowed_ += borrowedAmount
+    this.poolState.totalEverBorrowed += borrowedAmount
+    this.poolState.totalNumberOfLoans_ += BigInt(1)
+    this.poolState.totalEverNumberOfLoans += BigInt(1)
   }
 
   public increaseTotalInvested = (currencyAmount: bigint) => {
