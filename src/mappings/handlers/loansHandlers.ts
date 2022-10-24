@@ -125,6 +125,10 @@ async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>)
   const writeOffIndex = writeOffGroupIndex.isSome ? writeOffGroupIndex.unwrap().toNumber() : null
   await loan.writeOff(percentage.toBigInt(), penaltyInterestRatePerSec.toBigInt(), writeOffIndex)
   await loan.save()
+
+  const pool = await PoolService.getById(poolId.toString())
+  await pool.increaseTotalWrittenOff(loan.loanState.writtenOffAmount_)
+  await pool.save()
 }
 
 export const handleLoanClosed = errorHandler(_handleLoanClosed)

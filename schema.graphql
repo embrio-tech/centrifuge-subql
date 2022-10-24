@@ -50,6 +50,8 @@ type PoolState @entity {
   totalNumberOfLoans_: BigInt
 
   totalNumberOfActiveLoans: BigInt!
+  totalDebtOverdue: BigInt!
+  totalWrittenOff_: BigInt!
 
   # Cumulated transaction data since pool creation
   totalEverBorrowed: BigInt
@@ -336,7 +338,8 @@ type LoanState @entity {
   totalRepaid_: BigInt
 
   writeOffIndex: Int
-  writtenOffPercentage: BigInt
+  writtenOffPercentage_: BigInt
+  writtenOffAmount_: BigInt
   penaltyInterestRatePerSec: BigInt
 }
 
@@ -354,7 +357,8 @@ type LoanSnapshot @entity {
   totalRepaid_: BigInt
 
   writeOffIndex: Int
-  writtenOffPercentage: BigInt
+  writtenOffPercentage_: BigInt
+  writtenOffAmount_: BigInt
   penaltyInterestRatePerSec: BigInt
 }
 

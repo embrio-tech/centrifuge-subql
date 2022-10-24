@@ -1,7 +1,7 @@
 import { Option } from '@polkadot/types'
 import { AnyJson } from '@polkadot/types/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
-import { RAY } from '../../config'
+import { RAY, WAD } from '../../config'
 import { errorHandler } from '../../helpers/errorHandler'
 import { InterestAccrualRateDetails } from '../../helpers/types'
 import { Loan, LoanState, LoanStatus, LoanType } from '../../types'
@@ -61,9 +61,13 @@ export class LoanService {
 
   public writeOff = (percentage: bigint, penaltyInterestRatePerSec: bigint, writeOffIndex: number) => {
     logger.info(`Writing off loan ${this.loan.id} with ${percentage}`)
-    this.loanState.writtenOffPercentage = percentage
+    this.loanState.writtenOffPercentage_ = percentage
     this.loanState.penaltyInterestRatePerSec = penaltyInterestRatePerSec
     this.loanState.writeOffIndex = writeOffIndex
+
+    this.loanState.writtenOffAmount_ = nToBigInt(
+      bnToBn(this.loanState.outstandingDebt).mul(bnToBn(percentage)).div(WAD)
+    )
   }
 
   public updateLoanType = (loanType: string, loanSpec?: AnyJson) => {
