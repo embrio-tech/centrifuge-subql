@@ -3,7 +3,7 @@ import { AnyJson } from '@polkadot/types/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
 import { RAY, WAD } from '../../config'
 import { errorHandler } from '../../helpers/errorHandler'
-import { InterestAccrualRateDetails } from '../../helpers/types'
+import { InterestAccrualRateDetails, NftItemMetadata } from '../../helpers/types'
 import { Loan, LoanState, LoanStatus, LoanType } from '../../types'
 
 export class LoanService {
@@ -15,14 +15,15 @@ export class LoanService {
     this.loanState = loanState
   }
 
-  static init = async (poolId: string, loanId: string, collateral: bigint, timestamp: Date) => {
+  static init = async (poolId: string, loanId: string, nftClassId: bigint, nftItemId: bigint, timestamp: Date) => {
     logger.info(`Initialising loan ${loanId} for pool ${poolId}`)
     const loan = new Loan(`${poolId}-${loanId}`)
     const loanState = new LoanState(`${poolId}-${loanId}`)
 
     loan.createdAt = timestamp
     loan.poolId = poolId
-    loan.collateral = collateral
+    loan.collateralNftClassId = nftClassId
+    loan.collateralNftItemId = nftItemId
     loan.stateId = `${poolId}-${loanId}`
     loanState.active = false
     loanState.status = LoanStatus.CREATED
@@ -82,6 +83,11 @@ export class LoanService {
     this.loan.maturityDate = maturityDate
   }
 
+  public updateDiscountRate = (discountRate: bigint) => {
+    logger.info(`Updating discount rate for loan ${this.loan.id} to ${discountRate.toString()}`)
+    this.loan.discountRate = discountRate
+  }
+
   public activate = () => {
     logger.info(`Activating loan ${this.loan.id}`)
     this.loanState.active = true
@@ -102,4 +108,30 @@ export class LoanService {
     logger.info(`Updating outstanding debt for loan: ${this.loan.id} to ${this.loanState.outstandingDebt.toString()}`)
   }
   public updateOutstandingDebt = errorHandler(this._updateOutstandingDebt)
+
+  private _updateItemMetadata = async () => {
+    logger.info(
+      `Updating metadata for loan: ${this.loan.id} with ` +
+        `collectionId ${this.loan.collateralNftClassId.toString()}, ` +
+        `itemId: ${this.loan.collateralNftItemId.toString()}`
+    )
+    const itemMetadata = await api.query.uniques.instanceMetadataOf<Option<NftItemMetadata>>(
+      this.loan.collateralNftClassId,
+      this.loan.collateralNftItemId
+    )
+    if (itemMetadata.isNone) {
+      throw new Error(
+        `No metadata returned for loan: ${this.loan.id} with ` +
+          `collectionId ${this.loan.collateralNftClassId.toString()}, ` +
+          `itemId: ${this.loan.collateralNftItemId.toString()}`
+      )
+    }
+
+    const payload = itemMetadata.unwrap()
+
+    this.loan.metadata = payload.data.toUtf8()
+    this.loan.deposit = payload.deposit.toBigInt()
+    return this
+  }
+  public updateItemMetadata = errorHandler(this._updateItemMetadata)
 }

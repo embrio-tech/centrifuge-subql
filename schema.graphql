@@ -313,8 +313,14 @@ type Loan @entity {
   id: ID! # poolId - loanId
   createdAt: Date!
 
-  collateral: BigInt!
+  collateralNftClassId: BigInt!
+  collateralNftItemId: BigInt!
+
+  metadata: String
+  deposit: BigInt
+
   maturityDate: Date
+  discountRate: BigInt
 
   type: LoanType
   spec: String

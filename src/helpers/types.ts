@@ -145,6 +145,13 @@ export interface AccountData extends Struct {
   frozen: u128
 }
 
+export interface NftItemMetadata extends Struct {
+  deposit: u128
+  data: Bytes
+  isFrozen: boolean
+}
+
+// ClassId, ItemId
 export type LoanAsset = ITuple<[u64, u128]>
 
 // poolId

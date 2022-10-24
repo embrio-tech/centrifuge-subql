@@ -14,7 +14,7 @@ import { AccountService } from '../services/accountService'
 
 export const handleLoanCreated = errorHandler(_handleLoanCreated)
 async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedClosedEvent>) {
-  const [poolId, loanId, [, collateral]] = event.event.data
+  const [poolId, loanId, [nftClassId, nftItemId]] = event.event.data
   logger.info(`Loan created event for pool: ${poolId.toString()} loan: ${loanId.toString()}`)
   const pool = await PoolService.getById(poolId.toString())
   const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toString())
@@ -22,9 +22,11 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedClosedEvent>)
   const loan = await LoanService.init(
     poolId.toString(),
     loanId.toString(),
-    collateral.toBigInt(),
+    nftClassId.toBigInt(),
+    nftItemId.toBigInt(),
     event.block.timestamp
   )
+  await loan.updateItemMetadata()
   await loan.save()
 
   const bt = await BorrowerTransactionService.created({
@@ -48,6 +50,7 @@ async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedRepaidEvent
   // Update loan amount
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.borrow(amount.toBigInt())
+  await loan.updateItemMetadata()
   await loan.save()
 
   const bt = await BorrowerTransactionService.borrowed({
@@ -75,12 +78,15 @@ async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
 
   const loanSpecs = loanType.inner as LoanSpecs
   const maturityDate = loanSpecs.maturityDate ? new Date(loanSpecs.maturityDate.toNumber() * 1000) : null
+  const discountRate = loanSpecs.discountRate ? loanSpecs.discountRate.toBigInt() : null
 
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.activate()
   await loan.updateInterestRate(interestRatePerSec.toBigInt())
   await loan.updateLoanType(loanType.type, loanType.inner.toJSON())
   await loan.updateMaturityDate(maturityDate)
+  await loan.updateDiscountRate(discountRate)
+  await loan.updateItemMetadata()
   await loan.save()
 
   const bt = await BorrowerTransactionService.priced({
@@ -103,6 +109,7 @@ async function _handleLoanRepaid(event: SubstrateEvent<LoanBorrowedRepaidEvent>)
 
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.repay(amount.toBigInt())
+  await loan.updateItemMetadata()
   await loan.save()
 
   const bt = await BorrowerTransactionService.repaid({
@@ -124,6 +131,7 @@ async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>)
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   const writeOffIndex = writeOffGroupIndex.isSome ? writeOffGroupIndex.unwrap().toNumber() : null
   await loan.writeOff(percentage.toBigInt(), penaltyInterestRatePerSec.toBigInt(), writeOffIndex)
+  await loan.updateItemMetadata()
   await loan.save()
 
   const pool = await PoolService.getById(poolId.toString())
@@ -140,6 +148,7 @@ async function _handleLoanClosed(event: SubstrateEvent<LoanCreatedClosedEvent>) 
 
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.close()
+  await loan.updateItemMetadata()
   await loan.save()
 
   const bt = await BorrowerTransactionService.closed({

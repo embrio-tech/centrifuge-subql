@@ -31,6 +31,7 @@ export class PoolService {
     poolState.totalRedeemed_ = BigInt(0)
     poolState.totalNumberOfLoans_ = BigInt(0)
     poolState.totalNumberOfActiveLoans = BigInt(0)
+    poolState.totalWrittenOff_ = BigInt(0)
     poolState.totalDebtOverdue = BigInt(0)
 
     poolState.totalEverBorrowed = BigInt(0)
