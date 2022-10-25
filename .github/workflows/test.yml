@@ -26,10 +26,8 @@ jobs:
         run: yarn codegen
       - name: 'Run Linter'
         run: yarn lint
-      - name: 'Run Linter'
-        run: yarn test
   test:
-    name: 'Run tests'
+    name: 'Run Tests'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout Repository'
