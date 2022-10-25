@@ -175,7 +175,9 @@ export type TokensEndowedDepositedWithdrawnEvent = ITuple<[TokensCurrencyId, Acc
 
 export type ExtendedRpc = typeof api.rpc & {
   pools: {
-    trancheTokenPrice: PromiseRpcResult<AugmentedRpc<(poolId: u64, trancheId: number[]) => Observable<u128>>>
-    trancheTokenPrices: PromiseRpcResult<AugmentedRpc<(poolId: u64) => Observable<Vec<u128>>>>
+    trancheTokenPrice: PromiseRpcResult<
+      AugmentedRpc<(poolId: number | string, trancheId: number[]) => Observable<u128>>
+    >
+    trancheTokenPrices: PromiseRpcResult<AugmentedRpc<(poolId: number | string) => Observable<Vec<u128>>>>
   }
 }

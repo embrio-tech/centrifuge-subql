@@ -23,4 +23,4 @@ globalHere.logger = {
   trace: jest.fn(),
 }
 
-globalHere.api = { query: {} }
+globalHere.api = { query: {}, rpc: {} }
