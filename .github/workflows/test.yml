@@ -22,6 +22,8 @@ jobs:
           node-version: '16'
       - name: 'Install Dependencies'
         run: yarn install
+      - name: 'Generate Entities'
+        run: yarn codegen
       - name: 'Run Linter'
         run: yarn lint
       - name: 'Run Linter'
@@ -38,5 +40,7 @@ jobs:
           node-version: '16'
       - name: 'Install Dependencies'
         run: yarn install
+      - name: 'Generate Entities'
+        run: yarn codegen
       - name: 'Run Tests'
         run: yarn test
