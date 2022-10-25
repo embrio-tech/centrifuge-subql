@@ -2,7 +2,7 @@
 import { AugmentedRpc, PromiseRpcResult } from '@polkadot/api/types'
 import { Enum, Null, Struct, u128, u32, u64, U8aFixed, Option, Vec, Bytes } from '@polkadot/types'
 import { AccountId32, Address, Perquintill } from '@polkadot/types/interfaces'
-import { AnyTuple, ITuple, Observable } from '@polkadot/types/types'
+import { ITuple, Observable } from '@polkadot/types/types'
 
 export interface PoolDetails extends Struct {
   reserve: { total: u128; available: u128; max: u128 }
