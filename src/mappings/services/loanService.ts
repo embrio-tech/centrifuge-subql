@@ -78,14 +78,8 @@ export class LoanService {
     this.loan.spec = specBuff.toString('base64')
   }
 
-  public updateMaturityDate = (maturityDate: Date) => {
-    logger.info(`Updating maturity date for loan ${this.loan.id} to ${maturityDate.toISOString()}`)
-    this.loan.maturityDate = maturityDate
-  }
-
-  public updateDiscountRate = (discountRate: bigint) => {
-    logger.info(`Updating discount rate for loan ${this.loan.id} to ${discountRate.toString()}`)
-    this.loan.discountRate = discountRate
+  public updateLoanSpecs = (decodedLoanSpecs: DecodedLoanSpecs) => {
+    Object.assign(this.loan, decodedLoanSpecs)
   }
 
   public activate = () => {
@@ -128,10 +122,18 @@ export class LoanService {
     }
 
     const payload = itemMetadata.unwrap()
-
     this.loan.metadata = payload.data.toUtf8()
-    this.loan.deposit = payload.deposit.toBigInt()
+
     return this
   }
   public updateItemMetadata = errorHandler(this._updateItemMetadata)
+}
+
+interface DecodedLoanSpecs {
+  advanceRate: bigint
+  value: bigint
+  probabilityOfDefault?: bigint
+  lossGivenDefault?: bigint
+  discountRate?: bigint
+  maturityDate?: Date
 }

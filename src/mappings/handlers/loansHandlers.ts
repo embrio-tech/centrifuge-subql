@@ -77,15 +77,19 @@ async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
   const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toString())
 
   const loanSpecs = loanType.inner as LoanSpecs
-  const maturityDate = loanSpecs.maturityDate ? new Date(loanSpecs.maturityDate.toNumber() * 1000) : null
-  const discountRate = loanSpecs.discountRate ? loanSpecs.discountRate.toBigInt() : null
-
+  const decodedLoanSpecs = {
+    advanceRate: loanSpecs.advanceRate.toBigInt(),
+    value: loanSpecs.value.toBigInt(),
+    probabilityOfDefault: loanSpecs.probabilityOfDefault ? loanSpecs.probabilityOfDefault.toBigInt() : null,
+    lossGivenDefault: loanSpecs.lossGivenDefault ? loanSpecs.lossGivenDefault.toBigInt() : null,
+    discountRate: loanSpecs.discountRate ? loanSpecs.discountRate.toBigInt() : null,
+    maturityDate: loanSpecs.maturityDate ? new Date(loanSpecs.maturityDate.toNumber() * 1000) : null,
+  }
   const loan = await LoanService.getById(poolId.toString(), loanId.toString())
   await loan.activate()
   await loan.updateInterestRate(interestRatePerSec.toBigInt())
   await loan.updateLoanType(loanType.type, loanType.inner.toJSON())
-  await loan.updateMaturityDate(maturityDate)
-  await loan.updateDiscountRate(discountRate)
+  await loan.updateLoanSpecs(decodedLoanSpecs)
   await loan.updateItemMetadata()
   await loan.save()
 

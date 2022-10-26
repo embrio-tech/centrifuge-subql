@@ -317,10 +317,13 @@ type Loan @entity {
   collateralNftItemId: BigInt!
 
   metadata: String
-  deposit: BigInt
 
-  maturityDate: Date
+  advanceRate: BigInt
+  value: BigInt
+  probabilityOfDefault: BigInt
+  lossGivenDefault: BigInt
   discountRate: BigInt
+  maturityDate: Date
 
   type: LoanType
   spec: String
