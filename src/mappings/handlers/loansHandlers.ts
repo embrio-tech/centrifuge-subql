@@ -32,8 +32,8 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedClosedEvent>)
   const bt = await BorrowerTransactionService.created({
     poolId: poolId.toString(),
     loanId: loanId.toString(),
-    address: account.account.id,
-    epochNumber: pool.pool.currentEpoch,
+    address: account.id,
+    epochNumber: pool.currentEpoch,
     hash: event.extrinsic.extrinsic.hash.toString(),
     timestamp: event.block.timestamp,
   })
@@ -56,8 +56,8 @@ async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedRepaidEvent
   const bt = await BorrowerTransactionService.borrowed({
     poolId: poolId.toString(),
     loanId: loanId.toString(),
-    address: account.account.id,
-    epochNumber: pool.pool.currentEpoch,
+    address: account.id,
+    epochNumber: pool.currentEpoch,
     hash: event.extrinsic.extrinsic.hash.toString(),
     timestamp: event.block.timestamp,
     amount: amount.toBigInt(),
@@ -96,8 +96,8 @@ async function _handleLoanPriced(event: SubstrateEvent<LoanPricedEvent>) {
   const bt = await BorrowerTransactionService.priced({
     poolId: poolId.toString(),
     loanId: loanId.toString(),
-    address: account.account.id,
-    epochNumber: pool.pool.currentEpoch,
+    address: account.id,
+    epochNumber: pool.currentEpoch,
     hash: event.extrinsic.extrinsic.hash.toString(),
     timestamp: event.block.timestamp,
   })
@@ -119,8 +119,8 @@ async function _handleLoanRepaid(event: SubstrateEvent<LoanBorrowedRepaidEvent>)
   const bt = await BorrowerTransactionService.repaid({
     poolId: poolId.toString(),
     loanId: loanId.toString(),
-    address: account.account.id,
-    epochNumber: pool.pool.currentEpoch,
+    address: account.id,
+    epochNumber: pool.currentEpoch,
     hash: event.extrinsic.extrinsic.hash.toString(),
     timestamp: event.block.timestamp,
     amount: amount.toBigInt(),
@@ -139,7 +139,7 @@ async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>)
   await loan.save()
 
   const pool = await PoolService.getById(poolId.toString())
-  await pool.increaseTotalWrittenOff(loan.loanState.writtenOffAmount_)
+  await pool.increaseTotalWrittenOff(loan.writtenOffAmount_)
   await pool.save()
 }
 
@@ -158,8 +158,8 @@ async function _handleLoanClosed(event: SubstrateEvent<LoanCreatedClosedEvent>) 
   const bt = await BorrowerTransactionService.closed({
     poolId: poolId.toString(),
     loanId: loanId.toString(),
-    address: account.account.id,
-    epochNumber: pool.pool.currentEpoch,
+    address: account.id,
+    epochNumber: pool.currentEpoch,
     hash: event.extrinsic.extrinsic.hash.toString(),
     timestamp: event.block.timestamp,
   })

@@ -44,21 +44,21 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
     const orderData = {
       poolId: poolId.toString(),
       trancheId: trancheId.toString(),
-      epochNumber: pool.pool.currentEpoch,
+      epochNumber: pool.currentEpoch,
       hash: event.extrinsic.extrinsic.hash.toString(),
       timestamp: event.block.timestamp,
-      digits: (await CurrencyService.getById(pool.pool.currencyId)).currency.decimals,
-      price: tranche.trancheState.price,
+      digits: ((await CurrencyService.get(pool.currencyId)) as CurrencyService).decimals,
+      price: tranche.price,
       amount: amount.toBigInt(),
     }
 
     // CREATE 2 TRANSFERS FOR FROM AND TO ADDRESS
     // with from create TRANSFER_OUT
-    const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.account.id })
+    const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
     await txOut.save()
 
     // with to create TRANSFER_IN
-    const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.account.id })
+    const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
     await txIn.save()
 
     // CURRENCY TOKEN TRANSFER
@@ -71,14 +71,14 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
 
     if (!fromAddress.startsWith('pool')) {
       const fromAccount = await AccountService.getOrInit(from.toString())
-      const fromCurrencyBalance = await CurrencyBalanceService.getOrInit(fromAccount.account.id, currencyId)
+      const fromCurrencyBalance = await CurrencyBalanceService.getOrInit(fromAccount.id, currencyId)
       await fromCurrencyBalance.debit(amount.toBigInt())
       await fromCurrencyBalance.save()
     }
 
     if (!toAddress.startsWith('pool')) {
       const toAccount = await AccountService.getOrInit(to.toString())
-      const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.account.id, currencyId)
+      const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyId)
       await toCurrencyBalance.credit(amount.toBigInt())
       await toCurrencyBalance.save()
     }
@@ -95,7 +95,7 @@ async function _handleTokenEndowed(event: SubstrateEvent<TokensEndowedDepositedW
   )
   const currencyId = currency.type
   const toAccount = await AccountService.getOrInit(address.toString())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.account.id, currencyId)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyId)
   await toCurrencyBalance.credit(amount.toBigInt())
   await toCurrencyBalance.save()
 }
@@ -110,7 +110,7 @@ async function _handleTokenDeposited(event: SubstrateEvent<TokensEndowedDeposite
   )
   const currencyId = currency.type
   const toAccount = await AccountService.getOrInit(address.toString())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.account.id, currencyId)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyId)
   await toCurrencyBalance.credit(amount.toBigInt())
   await toCurrencyBalance.save()
 }
@@ -125,7 +125,7 @@ async function _handleTokenWithdrawn(event: SubstrateEvent<TokensEndowedDeposite
   )
   const currencyId = currency.type
   const toAccount = await AccountService.getOrInit(address.toString())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.account.id, currencyId)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyId)
   await toCurrencyBalance.debit(amount.toBigInt())
   await toCurrencyBalance.save()
 }

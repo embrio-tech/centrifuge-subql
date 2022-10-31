@@ -38,28 +38,27 @@ const tranches = trancheIds.map((trancheId, i) =>
 
 describe('Given a new tranche, when initialised', () => {
   test('then type is set to "ALL"', () => {
-    expect(tranches[0].tranche.type).toBe('ALL')
-    expect(tranches[1].tranche.type).toBe('ALL')
+    expect(tranches[0].type).toBe('ALL')
+    expect(tranches[1].type).toBe('ALL')
   })
 
   test('then reset accumulators are set to 0', () => {
-    const resetAccumulators = Object.getOwnPropertyNames(tranches[0].trancheState).filter((prop) => prop.endsWith('_'))
+    const resetAccumulators = Object.getOwnPropertyNames(tranches[0]).filter((prop) => prop.endsWith('_'))
     for (const resetAccumulator of resetAccumulators) {
-      expect(tranches[0].trancheState[resetAccumulator]).toBe(BigInt(0))
-      expect(tranches[1].trancheState[resetAccumulator]).toBe(BigInt(0))
+      expect(tranches[0][resetAccumulator]).toBe(BigInt(0))
+      expect(tranches[1][resetAccumulator]).toBe(BigInt(0))
     }
   })
 
   test('when the supply data is fetched, then the correct values are fetched and set', async () => {
     await tranches[0].updateSupply()
     expect(api.query.ormlTokens.totalIssuance).toBeCalledWith({ Tranche: [poolId, trancheIds[0]] })
-    expect(tranches[0].trancheState).toMatchObject({ supply: BigInt('9999000000000000000000') })
+    expect(tranches[0]).toMatchObject({ supply: BigInt('9999000000000000000000') })
   })
 
   test('then it can be saved to the database', async () => {
     await tranches[0].save()
-    expect(store.set).toHaveBeenNthCalledWith(1, 'TrancheState', `${poolId}-${trancheIds[0]}`, expect.anything())
-    expect(store.set).toHaveBeenNthCalledWith(2, 'Tranche', `${poolId}-${trancheIds[0]}`, expect.anything())
+    expect(store.set).toHaveBeenCalledWith('Tranche', `${poolId}-${trancheIds[0]}`, expect.anything())
   })
 })
 
@@ -67,6 +66,6 @@ describe('Given an existing tranche,', () => {
   test('when the rpc price is updated, then the value is fetched and set correctly', async () => {
     await tranches[0].updatePriceFromRpc()
     expect((api.rpc as ExtendedRpc).pools.trancheTokenPrices).toBeCalled()
-    expect(tranches[0].trancheState.price).toBe(BigInt('1000000000000000000'))
+    expect(tranches[0].price).toBe(BigInt('1000000000000000000'))
   })
 })

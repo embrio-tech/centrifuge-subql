@@ -4,18 +4,17 @@ import { CPREC, RAY_DIGITS, WAD, WAD_DIGITS } from '../../config'
 import { EpochDetails } from '../../helpers/types'
 import { Epoch, EpochState } from '../../types'
 
-export class EpochService {
-  readonly epoch: Epoch
-  readonly epochStates: EpochState[]
+export class EpochService extends Epoch {
+  readonly states: EpochState[]
 
-  constructor(epoch: Epoch, epochStates: EpochState[]) {
-    this.epoch = epoch
-    this.epochStates = epochStates
+  constructor(id) {
+    super(id)
+    this.states = []
   }
 
-  static init = async (poolId: string, epochNr: number, trancheIds: string[], timestamp: Date) => {
+  static async init(poolId: string, epochNr: number, trancheIds: string[], timestamp: Date) {
     logger.info(`Initialising epoch ${epochNr} for pool ${poolId}`)
-    const epoch = new Epoch(`${poolId}-${epochNr.toString()}`)
+    const epoch = new this(`${poolId}-${epochNr.toString()}`)
 
     epoch.index = epochNr
     epoch.poolId = poolId
@@ -26,7 +25,6 @@ export class EpochService {
     epoch.totalInvested = BigInt(0)
     epoch.totalRedeemed = BigInt(0)
 
-    const epochStates: EpochState[] = []
     for (const trancheId of trancheIds) {
       const epochState = new EpochState(`${poolId}-${epochNr}-${trancheId}`)
       epochState.epochId = epoch.id
@@ -34,35 +32,36 @@ export class EpochService {
       epochState.outstandingInvestOrders = BigInt(0)
       epochState.outstandingRedeemOrders = BigInt(0)
       epochState.outstandingRedeemOrdersCurrency = BigInt(0)
-      epochStates.push(epochState)
+      epoch.states.push(epochState)
     }
-    return new EpochService(epoch, epochStates)
+    return epoch
   }
 
-  static getById = async (poolId: string, epochNr: number) => {
-    const epoch = await Epoch.get(`${poolId}-${epochNr.toString()}`)
+  static async getById(poolId: string, epochNr: number) {
+    const epoch = (await this.get(`${poolId}-${epochNr.toString()}`)) as EpochService
     if (epoch === undefined) return undefined
     const epochStates = await EpochState.getByEpochId(`${poolId}-${epochNr.toString()}`)
-    return new EpochService(epoch, epochStates)
+    epoch.states.push(...epochStates)
+    return epoch
   }
 
-  save = async () => {
-    await this.epoch.save()
-    await Promise.all(this.epochStates.map((epochState) => epochState.save()))
+  async save() {
+    await Promise.all(this.states.map((epochState) => epochState.save()))
+    await this.save()
   }
 
-  public closeEpoch = (timestamp: Date) => {
-    this.epoch.closedAt = timestamp
+  public closeEpoch(timestamp: Date) {
+    this.closedAt = timestamp
   }
 
-  public executeEpoch = async (timestamp: Date, digits: number) => {
-    logger.info(`Updating EpochExecutionDetails for pool ${this.epoch.poolId} on epoch ${this.epoch.index}`)
+  public async executeEpoch(timestamp: Date, digits: number) {
+    logger.info(`Updating EpochExecutionDetails for pool ${this.poolId} on epoch ${this.index}`)
 
-    this.epoch.executedAt = timestamp
+    this.executedAt = timestamp
 
-    for (const epochState of this.epochStates) {
+    for (const epochState of this.states) {
       logger.info(`Querying execution information for tranche :${epochState.trancheId}`)
-      const epochResponse = await api.query.pools.epoch<Option<EpochDetails>>(epochState.trancheId, this.epoch.index)
+      const epochResponse = await api.query.pools.epoch<Option<EpochDetails>>(epochState.trancheId, this.index)
       logger.info(`EpochResponse: ${JSON.stringify(epochResponse)}`)
 
       if (epochResponse.isNone) throw new Error('No epoch details')
@@ -83,27 +82,27 @@ export class EpochService {
         digits
       )
 
-      this.epoch.totalInvested += epochState.fulfilledInvestOrders
-      this.epoch.totalRedeemed += epochState.fulfilledRedeemOrdersCurrency
+      this.totalInvested += epochState.fulfilledInvestOrders
+      this.totalRedeemed += epochState.fulfilledRedeemOrdersCurrency
     }
     return this
   }
 
-  public updateOutstandingInvestOrders = (trancheId: string, newAmount: bigint, oldAmount: bigint) => {
-    const trancheState = this.epochStates.find((trancheState) => trancheState.trancheId === trancheId)
+  public updateOutstandingInvestOrders(trancheId: string, newAmount: bigint, oldAmount: bigint) {
+    const trancheState = this.states.find((trancheState) => trancheState.trancheId === trancheId)
     if (trancheState === undefined) throw new Error(`No epochState with could be found for tranche: ${trancheId}`)
     trancheState.outstandingInvestOrders = trancheState.outstandingInvestOrders + newAmount - oldAmount
     return this
   }
 
-  public updateOutstandingRedeemOrders = (
+  public updateOutstandingRedeemOrders(
     trancheId: string,
     newAmount: bigint,
     oldAmount: bigint,
     tokenPrice: bigint,
     digits: number
-  ) => {
-    const trancheState = this.epochStates.find((trancheState) => trancheState.trancheId === trancheId)
+  ) {
+    const trancheState = this.states.find((trancheState) => trancheState.trancheId === trancheId)
     if (trancheState === undefined) throw new Error(`No epochState with could be found for tranche: ${trancheId}`)
     trancheState.outstandingRedeemOrders = trancheState.outstandingRedeemOrders + newAmount - oldAmount
     trancheState.outstandingRedeemOrdersCurrency = this.computeCurrencyAmount(
@@ -114,10 +113,11 @@ export class EpochService {
     return this
   }
 
-  private computeCurrencyAmount = (amount: bigint, price: bigint, digits: number) =>
-    nToBigInt(
+  private computeCurrencyAmount(amount: bigint, price: bigint, digits: number) {
+    return nToBigInt(
       bnToBn(amount)
         .mul(bnToBn(price))
         .div(CPREC(RAY_DIGITS + WAD_DIGITS - digits))
     )
+  }
 }
