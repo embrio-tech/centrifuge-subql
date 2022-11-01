@@ -153,7 +153,7 @@ export class PoolService extends Pool {
     return tokenPrices
   }
 
-  private async getActiveLoanData() {
+  public async getActiveLoanData() {
     logger.info(`Querying active loan data for pool: ${this.id}`)
     const loanDetails = await api.query.loans.activeLoans<Vec<PricedLoanDetails>>(this.id)
     const activeLoanData = loanDetails.reduce<ActiveLoanData>(
