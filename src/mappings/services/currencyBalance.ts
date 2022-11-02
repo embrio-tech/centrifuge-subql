@@ -28,7 +28,7 @@ export class CurrencyBalanceService extends CurrencyBalance {
     return currencyBalance
   }
 
-  private async getBalance() {
+  public async getBalance() {
     const balanceResponse = await api.query.ormlTokens.accounts<AccountData>(this.accountId, this.currencyId)
     this.amount = balanceResponse.free.toBigInt()
   }

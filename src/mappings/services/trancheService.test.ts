@@ -1,4 +1,5 @@
-import { ExtendedRpc } from 'centrifuge-subql/helpers/types'
+import { errorLogger } from '../../helpers/errorHandler'
+import { ExtendedRpc } from '../../helpers/types'
 import { TrancheService } from './trancheService'
 
 api.query['ormlTokens'] = {
@@ -8,8 +9,8 @@ api.query['ormlTokens'] = {
 
 api.rpc['pools'] = {
   trancheTokenPrices: jest.fn(() => [
-    { toBigInt: () => BigInt('1000000000000000000') },
     { toBigInt: () => BigInt('2000000000000000000') },
+    { toBigInt: () => BigInt('0') },
   ]),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
@@ -64,8 +65,15 @@ describe('Given a new tranche, when initialised', () => {
 
 describe('Given an existing tranche,', () => {
   test('when the rpc price is updated, then the value is fetched and set correctly', async () => {
-    await tranches[0].updatePriceFromRpc()
+    await tranches[0].updatePriceFromRpc().catch(errorLogger)
     expect((api.rpc as ExtendedRpc).pools.trancheTokenPrices).toBeCalled()
-    expect(tranches[0].price).toBe(BigInt('1000000000000000000'))
+    expect(tranches[0].price).toBe(BigInt('2000000000000000000'))
+  })
+
+  test('when a 0 rpc price is delivered, then the value is skipped and logged', async () => {
+    await tranches[1].updatePriceFromRpc().catch(errorLogger)
+    expect((api.rpc as ExtendedRpc).pools.trancheTokenPrices).toBeCalled()
+    expect(logger.error).toBeCalled()
+    expect(tranches[1].price).toBe(BigInt('1000000000000000000'))
   })
 })

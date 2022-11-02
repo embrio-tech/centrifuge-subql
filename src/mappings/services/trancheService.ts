@@ -2,9 +2,9 @@ import { u128 } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
 import { paginatedGetter } from '../../helpers/paginatedGetter'
 import { CPREC, RAY, RAY_DIGITS, WAD_DIGITS } from '../../config'
-import { errorHandler } from '../../helpers/errorHandler'
 import { ExtendedRpc, TrancheDetails } from '../../helpers/types'
 import { Tranche, TrancheSnapshot } from '../../types'
+import { TrancheProps } from 'centrifuge-subql/types/models/Tranche'
 
 export class TrancheService extends Tranche {
   static init(poolId: string, trancheId: string, index: number, trancheData: TrancheDetails) {
@@ -48,8 +48,9 @@ export class TrancheService extends Tranche {
   }
 
   static async getByPoolId(poolId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tranches = (await paginatedGetter('Tranche', 'poolId', poolId)).map((tranche) => this.create(tranche as any))
+    const tranches = (await paginatedGetter('Tranche', 'poolId', poolId)).map((tranche) =>
+      this.create(tranche as TrancheProps)
+    )
     return tranches as TrancheService[]
   }
 
@@ -73,7 +74,7 @@ export class TrancheService extends Tranche {
     return this
   }
 
-  private _updatePricefromRpc = async () => {
+  public async updatePriceFromRpc() {
     logger.info(`Qerying RPC price for tranche ${this.id}`)
     const poolId = this.poolId
     const tokenPrices = await (api.rpc as ExtendedRpc).pools.trancheTokenPrices(poolId)
@@ -82,7 +83,6 @@ export class TrancheService extends Tranche {
     this.updatePrice(trancheTokenPrice)
     return this
   }
-  public updatePriceFromRpc = errorHandler(this._updatePricefromRpc)
 
   public updateDebt(debt: bigint) {
     logger.info(`Updating debt for tranche ${this.id} to :${debt}`)
