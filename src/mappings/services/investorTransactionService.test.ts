@@ -44,6 +44,24 @@ describe('Given an invest/redeem order update, when the transaction is saved,', 
       expect.objectContaining({ type: InvestorTransactionType.REDEEM_ORDER_UPDATE })
     )
   })
+
+  test('then the amounts are set correctly', async () => {
+    set.mockReset()
+    await itx.save()
+    await rtx.save()
+    expect(store.set).toHaveBeenNthCalledWith(
+      1,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.INVEST_ORDER_UPDATE}`,
+      expect.objectContaining({ currencyAmount: orderData.amount })
+    )
+    expect(store.set).toHaveBeenNthCalledWith(
+      2,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.REDEEM_ORDER_UPDATE}`,
+      expect.objectContaining({ tokenAmount: orderData.amount })
+    )
+  })
 })
 
 describe('Given an invest/redeem order cancel, when the transaction is saved,', () => {
@@ -90,75 +108,93 @@ describe('Given an invest/redeem collection order, when the transaction is saved
       expect.objectContaining({ type: InvestorTransactionType.REDEEM_COLLECT })
     )
   })
+})
 
-  describe('Given an in/out transfer, when the transaction is saved,', () => {
-    const itx = InvestorTransactionService.transferIn(orderData)
-    const otx = InvestorTransactionService.transferOut(orderData)
+describe('Given an in/out transfer, when the transaction is saved,', () => {
+  const itx = InvestorTransactionService.transferIn(orderData)
+  const otx = InvestorTransactionService.transferOut(orderData)
 
-    test('then the type set correctly', async () => {
-      set.mockReset()
-      await itx.save()
-      await otx.save()
-      expect(store.set).toHaveBeenNthCalledWith(
-        1,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_IN}`,
-        expect.objectContaining({ type: InvestorTransactionType.TRANSFER_IN })
-      )
-      expect(store.set).toHaveBeenNthCalledWith(
-        2,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_OUT}`,
-        expect.objectContaining({ type: InvestorTransactionType.TRANSFER_OUT })
-      )
-    })
+  test('then the type set correctly', async () => {
+    set.mockReset()
+    await itx.save()
+    await otx.save()
+    expect(store.set).toHaveBeenNthCalledWith(
+      1,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_IN}`,
+      expect.objectContaining({ type: InvestorTransactionType.TRANSFER_IN })
+    )
+    expect(store.set).toHaveBeenNthCalledWith(
+      2,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_OUT}`,
+      expect.objectContaining({ type: InvestorTransactionType.TRANSFER_OUT })
+    )
   })
 
-  describe('Given an invest/redeem execution, when the transaction is saved,', () => {
-    const itx = InvestorTransactionService.executeInvestOrder(orderData)
-    const rtx = InvestorTransactionService.executeRedeemOrder(orderData)
+  test('then the amounts are set correctly', async () => {
+    set.mockReset()
+    await itx.save()
+    await otx.save()
+    expect(store.set).toHaveBeenNthCalledWith(
+      1,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_IN}`,
+      expect.objectContaining({ tokenAmount: orderData.amount })
+    )
+    expect(store.set).toHaveBeenNthCalledWith(
+      2,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.TRANSFER_OUT}`,
+      expect.objectContaining({ tokenAmount: orderData.amount })
+    )
+  })
+})
 
-    test('then the type is set correctly', async () => {
-      set.mockReset()
-      await itx.save()
-      await rtx.save()
-      expect(store.set).toHaveBeenNthCalledWith(
-        1,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.INVEST_EXECUTION}`,
-        expect.objectContaining({ type: InvestorTransactionType.INVEST_EXECUTION })
-      )
-      expect(store.set).toHaveBeenNthCalledWith(
-        2,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.REDEEM_EXECUTION}`,
-        expect.objectContaining({ type: InvestorTransactionType.REDEEM_EXECUTION })
-      )
-    })
+describe('Given an invest/redeem execution, when the transaction is saved,', () => {
+  const itx = InvestorTransactionService.executeInvestOrder(orderData)
+  const rtx = InvestorTransactionService.executeRedeemOrder(orderData)
 
-    test('then the amounts are set correctly', async () => {
-      set.mockReset()
-      await itx.save()
-      await rtx.save()
+  test('then the type is set correctly', async () => {
+    set.mockReset()
+    await itx.save()
+    await rtx.save()
+    expect(store.set).toHaveBeenNthCalledWith(
+      1,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.INVEST_EXECUTION}`,
+      expect.objectContaining({ type: InvestorTransactionType.INVEST_EXECUTION })
+    )
+    expect(store.set).toHaveBeenNthCalledWith(
+      2,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.REDEEM_EXECUTION}`,
+      expect.objectContaining({ type: InvestorTransactionType.REDEEM_EXECUTION })
+    )
+  })
 
-      expect(store.set).toHaveBeenNthCalledWith(
-        1,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.INVEST_EXECUTION}`,
-        expect.objectContaining({
-          currencyAmount: executedInvestCurrency,
-          tokenAmount: executedInvestToken,
-        })
-      )
-      expect(store.set).toHaveBeenNthCalledWith(
-        2,
-        'InvestorTransaction',
-        `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.REDEEM_EXECUTION}`,
-        expect.objectContaining({
-          currencyAmount: executedRedeemCurrency,
-          tokenAmount: executedRedeemToken,
-        })
-      )
-    })
+  test('then the amounts are set correctly', async () => {
+    set.mockReset()
+    await itx.save()
+    await rtx.save()
+
+    expect(store.set).toHaveBeenNthCalledWith(
+      1,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.INVEST_EXECUTION}`,
+      expect.objectContaining({
+        currencyAmount: executedInvestCurrency,
+        tokenAmount: executedInvestToken,
+      })
+    )
+    expect(store.set).toHaveBeenNthCalledWith(
+      2,
+      'InvestorTransaction',
+      `${orderData.hash}-${orderData.epochNumber}-${InvestorTransactionType.REDEEM_EXECUTION}`,
+      expect.objectContaining({
+        currencyAmount: executedRedeemCurrency,
+        tokenAmount: executedRedeemToken,
+      })
+    )
   })
 })
