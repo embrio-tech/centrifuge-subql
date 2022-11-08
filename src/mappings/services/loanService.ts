@@ -6,7 +6,7 @@ import { InterestAccrualRateDetails, NftItemMetadata } from '../../helpers/types
 import { Loan, LoanStatus, LoanType } from '../../types'
 
 export class LoanService extends Loan {
-  static async init(poolId: string, loanId: string, nftClassId: bigint, nftItemId: bigint, timestamp: Date) {
+  static init(poolId: string, loanId: string, nftClassId: bigint, nftItemId: bigint, timestamp: Date) {
     logger.info(`Initialising loan ${loanId} for pool ${poolId}`)
     const loan = new this(`${poolId}-${loanId}`)
 
