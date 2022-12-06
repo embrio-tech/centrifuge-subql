@@ -1,17 +1,36 @@
 import { Option, u128, Vec } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
 import { paginatedGetter } from '../../helpers/paginatedGetter'
-import { ExtendedRpc, NavDetails, PoolDetails, PricedLoanDetails, TrancheDetails } from '../../helpers/types'
+import {
+  ExtendedRpc,
+  NavDetails,
+  PoolDetails,
+  PoolMetadata,
+  PricedLoanDetails,
+  TrancheDetails,
+} from '../../helpers/types'
 import { Pool } from '../../types'
 
 export class PoolService extends Pool {
-  static init(poolId: string, timestamp: Date, blockNumber: number) {
+  static init(
+    poolId: string,
+    currencyId: string,
+    maxReserve: bigint,
+    maxNavAge: number,
+    minEpochTime: number,
+    timestamp: Date,
+    blockNumber: number
+  ) {
     const pool = new this(poolId)
+
+    pool.currencyId = currencyId
+    pool.maxReserve = maxReserve
+    pool.maxNavAge = maxNavAge
+    pool.minEpochTime = minEpochTime
 
     pool.netAssetValue = BigInt(0)
     pool.totalReserve = BigInt(0)
     pool.availableReserve = BigInt(0)
-    pool.maxReserve = BigInt(0)
     pool.totalDebt = BigInt(0)
     pool.value = BigInt(0)
 
@@ -38,14 +57,16 @@ export class PoolService extends Pool {
     return pool
   }
 
-  public async initData(currencyCallback: (ticker: string) => Promise<string>) {
-    const poolReq = await api.query.pools.pool<Option<PoolDetails>>(this.id)
+  public async initData() {
+    const [poolReq, metadataReq] = await Promise.all([
+      api.query.poolSystem.pool<Option<PoolDetails>>(this.id),
+      api.query.poolRegistry.poolMetadata<Option<PoolMetadata>>(this.id),
+    ])
+
     if (poolReq.isNone) throw new Error('No pool data available to create the pool')
+
     const poolData = poolReq.unwrap()
-
-    this.currencyId = await currencyCallback(poolData.currency.toString())
-    this.metadata = poolData.metadata.isSome ? poolData.metadata.unwrap().toUtf8() : 'NA'
-
+    this.metadata = metadataReq.isSome ? metadataReq.unwrap().metadata.toUtf8() : 'NA'
     this.minEpochTime = poolData.parameters.minEpochTime.toNumber()
     this.maxNavAge = poolData.parameters.maxNavAge.toNumber()
     return this
@@ -62,7 +83,7 @@ export class PoolService extends Pool {
   }
 
   public async updateState() {
-    const poolResponse = await api.query.pools.pool<Option<PoolDetails>>(this.id)
+    const poolResponse = await api.query.poolSystem.pool<Option<PoolDetails>>(this.id)
     logger.info(`Updating state for pool: ${this.id} with data: ${JSON.stringify(poolResponse.toHuman())}`)
     if (poolResponse.isSome) {
       const poolData = poolResponse.unwrap()
@@ -129,7 +150,7 @@ export class PoolService extends Pool {
   }
 
   public async getTranches() {
-    const poolResponse = await api.query.pools.pool<Option<PoolDetails>>(this.id)
+    const poolResponse = await api.query.poolSystem.pool<Option<PoolDetails>>(this.id)
     logger.info(`Fetching tranches for pool: ${this.id}`)
 
     if (poolResponse.isNone) throw new Error('Unable to fetch pool data!')

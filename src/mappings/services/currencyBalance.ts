@@ -2,9 +2,9 @@ import { AccountData } from '../../helpers/types'
 import { CurrencyBalance } from '../../types/models/CurrencyBalance'
 
 export class CurrencyBalanceService extends CurrencyBalance {
-  static init = (address: string, currency: string) => {
+  static init(address: string, currency: string) {
     logger.info(`Initialising new CurrencyBalance: ${address}-${currency}`)
-    const currencyBalance = new CurrencyBalanceService(`${address}-${currency}`)
+    const currencyBalance = new this(`${address}-${currency}`)
     currencyBalance.accountId = address
     currencyBalance.currencyId = currency
     currencyBalance.amount = BigInt(0)
@@ -13,9 +13,8 @@ export class CurrencyBalanceService extends CurrencyBalance {
 
   static async getById(address: string, currency: string) {
     const id = `${address}-${currency}`
-    const currencyBalance = new CurrencyBalanceService(id)
-    Object.assign(currencyBalance, await CurrencyBalanceService.get(id))
-    return currencyBalance
+    const currencyBalance = await this.get(id)
+    return currencyBalance as CurrencyBalanceService
   }
 
   static async getOrInit(address: string, currency: string) {

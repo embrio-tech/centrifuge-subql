@@ -18,12 +18,19 @@ export class OutstandingOrderService extends OutstandingOrder {
     return oo
   }
 
-  static initInvest(data: InvestorTransactionData) {
-    return this.init(data, data.amount, BigInt(0))
+  static initZero(data: InvestorTransactionData) {
+    return this.init(data, BigInt(0), BigInt(0))
   }
 
-  static initRedeem(data: InvestorTransactionData) {
-    return this.init(data, BigInt(0), data.amount)
+  static async getById(poolId: string, trancheId: string, address: string) {
+    const oo = await this.get(`${poolId}-${trancheId}-${address}`)
+    return oo as OutstandingOrderService
+  }
+
+  static async getOrInit(data: InvestorTransactionData) {
+    let oo = await this.getById(data.poolId, data.trancheId, data.address)
+    if (oo === undefined) oo = this.initZero(data)
+    return oo
   }
 
   static async getAllByTrancheId(poolId: string, trancheId: string) {
@@ -33,6 +40,14 @@ export class OutstandingOrderService extends OutstandingOrder {
       `${poolId}-${trancheId}`
     )) as OutstandingOrder[]
     return entities.map((ooEntity) => this.create(ooEntity) as OutstandingOrderService)
+  }
+
+  updateInvest(data: InvestorTransactionData) {
+    this.invest = data.amount
+  }
+
+  updateRedeem(data: InvestorTransactionData) {
+    this.redeem = data.amount
   }
 
   updateUnfulfilledInvest(investFulfillment: bigint) {

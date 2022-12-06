@@ -1,6 +1,6 @@
 import { PoolService } from './poolService'
 
-api.query['pools'] = {
+api.query['poolSystem'] = {
   pool: jest.fn(() => ({
     isSome: true,
     isNone: false,
@@ -38,7 +38,7 @@ const poolId = '4355663',
   now = new Date(),
   block = 235443
 
-const pool = PoolService.init(poolId, now, block)
+const pool = PoolService.init(poolId, 'AUSD', BigInt(100000000), 12, 12, now, block)
 
 describe('Given a new pool, when initialised', () => {
   test('then type is set to "ALL"', () => {
@@ -61,8 +61,8 @@ describe('Given a new pool, when initialised', () => {
   })
 
   test('when the pool data is initialised, then the correct values are fetched and set', async () => {
-    await pool.initData(async () => 'AUSD')
-    expect(api.query.pools.pool).toBeCalledWith(poolId)
+    await pool.initData()
+    expect(api.query.poolSystem.pool).toBeCalledWith(poolId)
     expect(pool).toMatchObject({ currencyId: 'AUSD', metadata: 'AAA', minEpochTime: 500, maxNavAge: 500 })
   })
 
@@ -81,7 +81,7 @@ describe('Given an existing pool,', () => {
 
   test('when the pool state is updated, then the values are fetched and set correctly', async () => {
     await pool.updateState()
-    expect(api.query.pools.pool).toBeCalledWith(poolId)
+    expect(api.query.poolSystem.pool).toBeCalledWith(poolId)
     expect(pool).toMatchObject({
       totalReserve: BigInt(91000000000000),
       availableReserve: BigInt(92000000000000),

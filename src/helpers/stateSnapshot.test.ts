@@ -15,7 +15,7 @@ const poolId = '123456789',
   blockNumber = 11234
 
 describe('Given a populated pool,', () => {
-  const pool = PoolService.init(poolId, timestamp, blockNumber)
+  const pool = PoolService.init(poolId, 'AUSD', BigInt(6000), 23, 12, timestamp, blockNumber)
 
   test('when a snapshot is taken, then the id is set correctly', async () => {
     set.mockReset()
@@ -63,7 +63,7 @@ describe('Given a populated pool,', () => {
 })
 
 describe('Given a pool with non zero accumulators, ', () => {
-  const pool = PoolService.init(poolId, timestamp, blockNumber)
+  const pool = PoolService.init(poolId, 'AUSD', BigInt(6000), 23, 12, timestamp, blockNumber)
   set.mockReset()
   getByField.mockReset()
   getByField.mockReturnValue([pool])

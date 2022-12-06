@@ -24,6 +24,7 @@ export class TrancheService extends Tranche {
     tranche.index = index
     tranche.isResidual = trancheData.trancheType.isResidual
     tranche.seniority = trancheData.seniority.toNumber()
+    tranche.debt = trancheData.debt.toBigInt()
 
     if (!tranche.isResidual) {
       tranche.interestRatePerSec = trancheData.trancheType.asNonResidual.interestRatePerSec.toBigInt()

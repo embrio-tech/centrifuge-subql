@@ -18,7 +18,11 @@ api.rpc['pools'] = {
 const poolId = '4355663',
   trancheIds = ['0x855f5572a85a957c48ef266a3f240ea0', '0x855f5572a85a957c48ef266a3f240ea1']
 
-const trancheDataResidual = { trancheType: { isResidual: true }, seniority: { toNumber: () => 0 } }
+const trancheDataResidual = {
+  trancheType: { isResidual: true },
+  seniority: { toNumber: () => 0 },
+  debt: { toBigInt: () => BigInt(0) },
+}
 const trancheDataNonResidual = {
   trancheType: {
     isResidual: false,
@@ -28,6 +32,7 @@ const trancheDataNonResidual = {
     },
   },
   seniority: { toNumber: () => 1 },
+  debt: { toBigInt: () => BigInt(0) },
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

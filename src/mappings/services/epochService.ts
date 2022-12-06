@@ -1,7 +1,8 @@
 import { Option } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
+import { u64 } from '@polkadot/types'
 import { CPREC, RAY_DIGITS, WAD, WAD_DIGITS } from '../../config'
-import { EpochDetails } from '../../helpers/types'
+import { OrdersFulfillment } from '../../helpers/types'
 import { Epoch, EpochState } from '../../types'
 
 export class EpochService extends Epoch {
@@ -45,9 +46,9 @@ export class EpochService extends Epoch {
     return epoch
   }
 
-  async save() {
-    await Promise.all(this.states.map((epochState) => epochState.save()))
+  async saveWithStates() {
     await this.save()
+    await Promise.all(this.states.map((epochState) => epochState.save()))
   }
 
   public closeEpoch(timestamp: Date) {
@@ -55,26 +56,45 @@ export class EpochService extends Epoch {
   }
 
   public async executeEpoch(timestamp: Date, digits: number) {
-    logger.info(`Updating EpochExecutionDetails for pool ${this.poolId} on epoch ${this.index}`)
-
+    logger.info(`Updating OrderFulfillmentData for pool ${this.poolId} on epoch ${this.index}`)
     this.executedAt = timestamp
 
     for (const epochState of this.states) {
-      logger.info(`Querying execution information for tranche :${epochState.trancheId}`)
-      const epochResponse = await api.query.pools.epoch<Option<EpochDetails>>(epochState.trancheId, this.index)
-      logger.info(`EpochResponse: ${JSON.stringify(epochResponse)}`)
+      logger.info(`Fetching data for tranche: ${epochState.trancheId}`)
+      const trancheCurrency = [this.poolId, epochState.trancheId]
+      const [investOrderId, redeemOrderId] = await Promise.all([
+        api.query.investments.investOrderId<u64>(trancheCurrency),
+        api.query.investments.redeemOrderId<u64>(trancheCurrency),
+      ])
+      logger.info(`investOrderId: ${investOrderId.toNumber()}, redeemOrderId: ${redeemOrderId.toNumber()}`)
+      const [investOrderFulfillment, redeemOrderFulfillment] = await Promise.all([
+        api.query.investments.clearedInvestOrders<Option<OrdersFulfillment>>(
+          trancheCurrency,
+          investOrderId.toNumber() - 1
+        ),
+        api.query.investments.clearedRedeemOrders<Option<OrdersFulfillment>>(
+          trancheCurrency,
+          redeemOrderId.toNumber() - 1
+        ),
+      ])
 
-      if (epochResponse.isNone) throw new Error('No epoch details')
+      logger.info(JSON.stringify(investOrderFulfillment))
+      logger.info(JSON.stringify(redeemOrderFulfillment))
 
-      const epochDetails = epochResponse.unwrap()
-      epochState.price = epochDetails.tokenPrice.toBigInt()
-      epochState.investFulfillment = epochDetails.investFulfillment.toBigInt()
-      epochState.redeemFulfillment = epochDetails.redeemFulfillment.toBigInt()
+      if (investOrderFulfillment.isNone || redeemOrderFulfillment.isNone)
+        throw new Error('Failed to fetch epoch solutions')
+
+      const investSolution = investOrderFulfillment.unwrap(),
+        redeemSolution = redeemOrderFulfillment.unwrap()
+
+      epochState.price = investSolution.price.toBigInt()
+      epochState.investFulfillment = investSolution.ofAmount.toBigInt()
+      epochState.redeemFulfillment = redeemSolution.ofAmount.toBigInt()
       epochState.fulfilledInvestOrders = nToBigInt(
-        bnToBn(epochState.outstandingInvestOrders).mul(epochDetails.investFulfillment.toBn()).div(WAD)
+        bnToBn(epochState.outstandingInvestOrders).mul(investSolution.ofAmount.toBn()).div(WAD)
       )
       epochState.fulfilledRedeemOrders = nToBigInt(
-        bnToBn(epochState.outstandingRedeemOrders).mul(epochDetails.redeemFulfillment.toBn()).div(WAD)
+        bnToBn(epochState.outstandingRedeemOrders).mul(redeemSolution.ofAmount.toBn()).div(WAD)
       )
       epochState.fulfilledRedeemOrdersCurrency = this.computeCurrencyAmount(
         epochState.fulfilledRedeemOrders,
@@ -89,7 +109,7 @@ export class EpochService extends Epoch {
   }
 
   public updateOutstandingInvestOrders(trancheId: string, newAmount: bigint, oldAmount: bigint) {
-    const trancheState = this.states.find((trancheState) => trancheState.trancheId === trancheId)
+    const trancheState = this.states.find((epochState) => epochState.trancheId === trancheId)
     if (trancheState === undefined) throw new Error(`No epochState with could be found for tranche: ${trancheId}`)
     trancheState.outstandingInvestOrders = trancheState.outstandingInvestOrders + newAmount - oldAmount
     return this
