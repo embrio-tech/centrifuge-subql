@@ -7,7 +7,6 @@ api.query['poolSystem'] = {
     toHuman: jest.fn(),
     unwrap: () => ({
       currency: 'AUSD',
-      metadata: { isSome: true, unwrap: () => ({ toUtf8: () => 'AAA' }) },
       reserve: {
         total: { toBigInt: () => BigInt(91000000000000) },
         available: { toBigInt: () => BigInt(92000000000000) },
@@ -18,6 +17,15 @@ api.query['poolSystem'] = {
         maxNavAge: { toNumber: () => 500 },
       },
     }),
+  })),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any
+
+api.query['poolRegistry'] = {
+  poolMetadata: jest.fn(() => ({
+    isSome: true,
+    isNone: false,
+    unwrap: () => ({ metadata: { toUtf8: () => 'AAA' } }),
   })),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
