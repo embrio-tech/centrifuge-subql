@@ -33,15 +33,15 @@ type Pool @entity {
   value: BigInt!
 
   # Aggregated transaction data over the last period
-  sumBorrowedAmount_: BigInt
-  sumRepaidAmount_: BigInt
-  sumInvestedAmount_: BigInt
-  sumRedeemedAmount_: BigInt
-  sumNumberOfLoans_: BigInt
+  sumBorrowedAmount_R: BigInt
+  sumRepaidAmount_R: BigInt
+  sumInvestedAmount_R: BigInt
+  sumRedeemedAmount_R: BigInt
+  sumNumberOfLoans_R: BigInt
 
   sumNumberOfActiveLoans: BigInt!
   sumDebtOverdue: BigInt!
-  sumDebtWrittenOff_: BigInt!
+  sumDebtWrittenOff_R: BigInt!
 
   # Cumulated transaction data since pool creation
   sumBorrowedAmount: BigInt
@@ -68,11 +68,11 @@ type PoolSnapshot @entity {
   value: BigInt!
 
   # Aggregated transaction data over the last period
-  sumBorrowedAmount_: BigInt
-  sumRepaidAmount_: BigInt
-  sumInvestedAmount_: BigInt
-  sumRedeemedAmount_: BigInt
-  sumNumberOfLoans_: BigInt
+  sumBorrowedAmount_R: BigInt
+  sumRepaidAmount_R: BigInt
+  sumInvestedAmount_R: BigInt
+  sumRedeemedAmount_R: BigInt
+  sumNumberOfLoans_R: BigInt
 
   sumNumberOfActiveLoans: BigInt!
 
@@ -100,13 +100,13 @@ type Tranche @entity {
   tokenPrice: BigInt
   sumDebt: BigInt
 
-  sumOutstandingInvestOrders_: BigInt!
-  sumOutstandingRedeemOrders_: BigInt!
-  sumOutstandingRedeemOrdersCurrency_: BigInt!
+  sumOutstandingInvestOrders_R: BigInt!
+  sumOutstandingRedeemOrders_R: BigInt!
+  sumOutstandingRedeemOrdersCurrency_R: BigInt!
 
-  sumFulfilledInvestOrders_: BigInt!
-  sumFulfilledRedeemOrders_: BigInt!
-  sumFulfilledRedeemOrdersCurrency_: BigInt!
+  sumFulfilledInvestOrders_R: BigInt!
+  sumFulfilledRedeemOrders_R: BigInt!
+  sumFulfilledRedeemOrdersCurrency_R: BigInt!
 
   yield30DaysAnnualized: BigInt
   yield90DaysAnnualized: BigInt
@@ -126,13 +126,13 @@ type TrancheSnapshot @entity {
   tokenPrice: BigInt
   sumDebt: BigInt
 
-  sumOutstandingInvestOrders_: BigInt!
-  sumOutstandingRedeemOrders_: BigInt!
-  sumOutstandingRedeemOrdersCurrency_: BigInt!
+  sumOutstandingInvestOrders_R: BigInt!
+  sumOutstandingRedeemOrders_R: BigInt!
+  sumOutstandingRedeemOrdersCurrency_R: BigInt!
 
-  sumFulfilledInvestOrders_: BigInt!
-  sumFulfilledRedeemOrders_: BigInt!
-  sumFulfilledRedeemOrdersCurrency_: BigInt!
+  sumFulfilledInvestOrders_R: BigInt!
+  sumFulfilledRedeemOrders_R: BigInt!
+  sumFulfilledRedeemOrdersCurrency_R: BigInt!
 
   yield30DaysAnnualized: BigInt
   yield90DaysAnnualized: BigInt
@@ -324,12 +324,12 @@ type Loan @entity {
 
   outstandingDebt: BigInt
 
-  borrowedAmount_: BigInt
-  repaidAmount_: BigInt
+  borrowedAmount_R: BigInt
+  repaidAmount_R: BigInt
 
   writeOffIndex: Int
-  writtenOffPercentage_: BigInt
-  writtenOffAmount_: BigInt
+  writtenOffPercentage_R: BigInt
+  writtenOffAmount_R: BigInt
   penaltyInterestRatePerSec: BigInt
 }
 
@@ -343,12 +343,12 @@ type LoanSnapshot @entity {
 
   outstandingDebt: BigInt
 
-  borrowedAmount_: BigInt
-  repaidAmount_: BigInt
+  borrowedAmount_R: BigInt
+  repaidAmount_R: BigInt
 
   writeOffIndex: Int
-  writtenOffPercentage_: BigInt
-  writtenOffAmount_: BigInt
+  writtenOffPercentage_R: BigInt
+  writtenOffAmount_R: BigInt
   penaltyInterestRatePerSec: BigInt
 }
 

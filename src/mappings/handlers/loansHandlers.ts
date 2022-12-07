@@ -153,7 +153,7 @@ async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>)
   const pool = await PoolService.getById(poolId.toString())
   if (pool === undefined) throw new Error('Pool not found!')
 
-  await pool.increaseWriteOff(loan.writtenOffAmount_)
+  await pool.increaseWriteOff(loan.writtenOffAmount_R)
   await pool.save()
 }
 
