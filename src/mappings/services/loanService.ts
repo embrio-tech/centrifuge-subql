@@ -14,11 +14,11 @@ export class LoanService extends Loan {
     loan.poolId = poolId
     loan.collateralNftClassId = nftClassId
     loan.collateralNftItemId = nftItemId
-    loan.active = false
+    loan.isActive = false
     loan.status = LoanStatus.CREATED
     loan.outstandingDebt = BigInt(0)
-    loan.totalBorrowed_ = BigInt(0)
-    loan.totalRepaid_ = BigInt(0)
+    loan.borrowedAmount_ = BigInt(0)
+    loan.repaidAmount_ = BigInt(0)
 
     return loan
   }
@@ -30,12 +30,12 @@ export class LoanService extends Loan {
 
   public borrow(amount: bigint) {
     logger.info(`Increasing outstanding debt for loan ${this.id} by ${amount}`)
-    this.totalBorrowed_ += amount
+    this.borrowedAmount_ += amount
   }
 
   public repay(amount: bigint) {
     logger.info(`Decreasing outstanding debt for loan ${this.id} by ${amount}`)
-    this.totalRepaid_ += amount
+    this.repaidAmount_ += amount
   }
 
   public updateInterestRate(interestRatePerSec: bigint) {
@@ -65,13 +65,13 @@ export class LoanService extends Loan {
 
   public activate() {
     logger.info(`Activating loan ${this.id}`)
-    this.active = true
+    this.isActive = true
     this.status = LoanStatus.ACTIVE
   }
 
   public close() {
     logger.info(`Closing loan ${this.id}`)
-    this.active = false
+    this.isActive = false
     this.status = LoanStatus.CLOSED
   }
 

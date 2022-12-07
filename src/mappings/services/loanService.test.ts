@@ -35,7 +35,7 @@ const loan = LoanService.init(poolId, loanId, nftClassId, nftItemId, timestamp)
 
 describe('Given a new loan, when initialised', () => {
   test('then type is inactive', () => {
-    expect(loan.active).toBe(false)
+    expect(loan.isActive).toBe(false)
     expect(loan.status).toBe('CREATED')
   })
 
