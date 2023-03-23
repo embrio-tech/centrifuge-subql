@@ -14,7 +14,7 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: substrate/Runtime
-    startBlock: 54000
+    startBlock: 1
     mapping:
       file: ./dist/index.js
       handlers:
