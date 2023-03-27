@@ -88,11 +88,8 @@ export class PoolService extends Pool {
   }
 
   public async updatePortfolioValuation() {
-    const navResponse = await api.query.loans.portfolioValuation<Option<NavDetails>>(this.id)
-    if (navResponse.isSome) {
-      const navData = navResponse.unwrap()
-      this.portfolioValuation = navData.latest.toBigInt()
-    }
+    const navResponse = await api.query.loans.portfolioValuation<NavDetails>(this.id)
+    this.portfolioValuation = navResponse.value.toBigInt()
     return this
   }
 

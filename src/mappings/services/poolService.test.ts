@@ -31,13 +31,11 @@ api.query['poolRegistry'] = {
 } as any
 
 api.query['loans'] = {
-  poolNAV: jest.fn(() => ({
-    isSome: true,
-    unwrap: jest.fn(() => ({
-      latest: {
-        toBigInt: () => BigInt(100000000000000),
-      },
-    })),
+  portfolioValuation: jest.fn(() => ({
+    value: {
+      toBigInt: () => BigInt(100000000000000),
+    },
+    lastUpdated: () => Number(100000),
   })),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any

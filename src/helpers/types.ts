@@ -67,7 +67,7 @@ export interface TrancheTypeEnum extends Enum {
 }
 
 export interface NavDetails extends Struct {
-  latest: u128
+  value: u128
   lastUpdated: u64
 }
 
