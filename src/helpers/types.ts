@@ -69,7 +69,6 @@ export interface TrancheTypeEnum extends Enum {
 export interface NavDetails extends Struct {
   value: u128
   lastUpdated: u64
-  // values: Vec<ITuple<[u64, u128]>>
 }
 
 export interface EpochExecutionInfo extends Struct {
@@ -298,7 +297,7 @@ export type LoanClosedEvent = ITuple<[u64, u64, LoanAsset]>
 // poolId, loanId, amount
 export type LoanBorrowedRepaidEvent = ITuple<[u64, u64, u128]>
 //poolId, loanId, writeOffStatus
-export type LoanWrittenOffEvent = ITuple<[u64, u128, LoanWriteOffStatus]>
+export type LoanWrittenOffEvent = ITuple<[u64, u64, LoanWriteOffStatus]>
 
 // poolId, epochId
 export type EpochClosedExecutedEvent = ITuple<[u64, u32]>
