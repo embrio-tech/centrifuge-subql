@@ -198,7 +198,7 @@ export interface LoanExternalActivePricing extends Struct {
 
 export interface CfgOracleKey extends Enum {
   isIsin: boolean
-  asIsin: unknown // [u8;12]
+  asIsin: U8aFixed
 }
 
 export interface LoanExternalPricingMaxBorrowAmount extends Enum {
