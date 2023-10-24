@@ -79,7 +79,7 @@ export class PoolService extends Pool {
 
   public async updateState() {
     const poolResponse = await api.query.poolSystem.pool<Option<PoolDetails>>(this.id)
-    logger.info(`Updating state for pool: ${this.id} with data: ${JSON.stringify(poolResponse.toHuman())}`)
+    logger.info(`Updating state for pool: ${this.id}`)
     if (poolResponse.isSome) {
       const poolData = poolResponse.unwrap()
       this.totalReserve = poolData.reserve.total.toBigInt()
@@ -164,7 +164,6 @@ export class PoolService extends Pool {
   public async getActiveLoanData() {
     logger.info(`Querying active loan data for pool: ${this.id}`)
     const loanDetails = await api.query.loans.activeLoans<Vec<ITuple<[u64, LoanInfoActive]>>>(this.id)
-    logger.info(`loanDetails: ${loanDetails}`)
     const activeLoanData = loanDetails.reduce<ActiveLoanData>(
       (last, current) => ({
         ...last,

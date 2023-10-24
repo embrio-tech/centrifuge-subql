@@ -3,6 +3,25 @@ import type { OverrideBundleDefinition } from '@polkadot/types/types'
 /* eslint-disable sort-keys */
 
 const definitions: OverrideBundleDefinition = {
+  runtime: {
+    loansApi: [
+      {
+        methods: {
+          portfolio: {
+            description: 'Fetches active loan information including PV',
+            params: [
+              {
+                name: 'poolId',
+                type: 'u64',
+              },
+            ],
+            type: 'Vec<(u64, struct)>',
+          },
+        },
+        version: 1,
+      },
+    ],
+  },
   rpc: {
     pools: {
       trancheTokenPrices: {
