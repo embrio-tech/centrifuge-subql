@@ -14,4 +14,10 @@ export class AccountService extends Account {
     }
     return account as AccountService
   }
+
+  public isEvm() {
+    const suffix = '45564d00'
+    return this.id.length === 66 && this.id.endsWith(suffix)
+  }
+
 }
