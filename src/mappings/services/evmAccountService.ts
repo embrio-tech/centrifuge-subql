@@ -9,7 +9,7 @@ export class EvmAccountService extends EvmAccount {
   }
 
   static async getOrInit(address: string): Promise<EvmAccountService> {
-    let account = await this.get(address)
+    let account = await this.get(address) as EvmAccountService
     if (account === undefined) {
       account = this.init(address)
       await account.save()

@@ -22,9 +22,7 @@ async function _handleInvestOrderUpdated(event: SubstrateEvent<OrderUpdatedEvent
   const pool = await PoolService.getById(poolId.toString())
   if (pool === undefined) throw new Error('Pool not found!')
 
-  const account = await AccountService.getOrInit(address.toString())
-  if(account.isEvm()) await EvmAccountService.getOrInit(address.toString())
-
+  const account = await AccountService.getOrInit(address.toHex(), EvmAccountService)
   const tranche = await TrancheService.getById(poolId.toString(), trancheId.toHex())
 
   // Update tranche price
@@ -85,8 +83,7 @@ async function _handleRedeemOrderUpdated(event: SubstrateEvent<OrderUpdatedEvent
   const pool = await PoolService.getById(poolId.toString())
   if (pool === undefined) throw new Error('Pool not found!')
 
-  const account = await AccountService.getOrInit(address.toString())
-  if(account.isEvm()) await EvmAccountService.getOrInit(address.toString())
+  const account = await AccountService.getOrInit(address.toHex(), EvmAccountService)
 
   const tranche = await TrancheService.getById(poolId.toString(), trancheId.toHex())
 
@@ -140,7 +137,7 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
   const [{ poolId, trancheId }, address, , investCollection] = event.event.data
   logger.info(
     `Orders collected for tranche ${poolId.toString()}-${trancheId.toString()}. ` +
-      `Address: ${address.toString()} at ` +
+      `Address: ${address.toHex()} at ` +
       `block ${event.block.block.header.number.toString()} hash:${event.extrinsic.extrinsic.hash.toString()}`
   )
 
@@ -149,8 +146,7 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
   const endEpochId = pool.lastEpochClosed
   logger.info(`Collection for ending epoch: ${endEpochId}`)
 
-  const account = await AccountService.getOrInit(address.toString())
-  if(account.isEvm()) await EvmAccountService.getOrInit(address.toString())
+  const account = await AccountService.getOrInit(address.toHex(), EvmAccountService)
 
   const tranche = await TrancheService.getById(poolId.toString(), trancheId.toHex())
 
@@ -187,7 +183,7 @@ async function _handleRedeemOrdersCollected(event: SubstrateEvent<RedeemOrdersCo
   const [{ poolId, trancheId }, address, , redeemCollection] = event.event.data
   logger.info(
     `Orders collected for tranche ${poolId.toString()}-${trancheId.toString()}. ` +
-      `Address: ${address.toString()} ` +
+      `Address: ${address.toHex()} ` +
       `block ${event.block.block.header.number.toString()} hash:${event.extrinsic.extrinsic.hash.toString()}`
   )
 
@@ -196,8 +192,7 @@ async function _handleRedeemOrdersCollected(event: SubstrateEvent<RedeemOrdersCo
   const endEpochId = pool.lastEpochClosed
   logger.info(`Collection for ending epoch: ${endEpochId}`)
 
-  const account = await AccountService.getOrInit(address.toHex())
-  if(account.isEvm()) await EvmAccountService.getOrInit(address.toString())
+  const account = await AccountService.getOrInit(address.toHex(), EvmAccountService)
 
   const tranche = await TrancheService.getById(poolId.toString(), trancheId.toHex())
 
