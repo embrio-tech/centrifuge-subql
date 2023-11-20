@@ -10,7 +10,7 @@ export class CurrencyService extends Currency {
   }
 
   static async getOrInit(ticker: string, assetId?: string) {
-    const id = ticker ? `${ticker}-${assetId}` : ticker
+    const id = assetId ? `${ticker}-${assetId}` : ticker
     let currency = await this.get(id)
     if (currency === undefined) {
       const assetMetadata = (await api.query.ormlAssetRegistry.metadata({
