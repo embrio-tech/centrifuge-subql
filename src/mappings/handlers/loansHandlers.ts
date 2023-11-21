@@ -3,13 +3,14 @@ import {
   LoanBorrowedEvent,
   LoanClosedEvent,
   LoanCreatedEvent,
+  LoanDebtTransferred,
   LoanRepaidEvent,
   LoanWrittenOffEvent,
 } from '../../helpers/types'
 import { errorHandler } from '../../helpers/errorHandler'
 import { PoolService } from '../services/poolService'
 import { LoanService } from '../services/loanService'
-import { BorrowerTransactionService } from '../services/borrowerTransactionService'
+import { BorrowerTransactionData, BorrowerTransactionService } from '../services/borrowerTransactionService'
 import { AccountService } from '../services/accountService'
 import { EpochService } from '../services/epochService'
 import { WAD } from '../../config'
@@ -212,4 +213,46 @@ async function _handleLoanClosed(event: SubstrateEvent<LoanClosedEvent>) {
     timestamp: event.block.timestamp,
   })
   await bt.save()
+}
+
+export const handleLoanDebtTransferred = errorHandler(_handleLoanDebtTransferred)
+async function _handleLoanDebtTransferred(event: SubstrateEvent<LoanDebtTransferred>) {
+  const [poolId, fromLoanId, toLoanId, amount] = event.event.data
+
+  const pool = await PoolService.getById(poolId.toString())
+  if (pool === undefined) throw new Error('Pool not found!')
+
+  logger.info(
+    `Loan debt transferred event for pool: ${poolId.toString()}, from loan: ${fromLoanId.toString()} ` +
+      `to loan: ${toLoanId.toString()} amount: ${amount.toString()}`
+  )
+
+  const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toHex(), EvmAccountService)
+
+  const fromLoan = await LoanService.getById(poolId.toString(), fromLoanId.toString())
+  await fromLoan.repay(amount.toBigInt())
+  await fromLoan.updateItemMetadata()
+  await fromLoan.save()
+
+  const toLoan = await LoanService.getById(poolId.toString(), toLoanId.toString())
+  await toLoan.repay(amount.toBigInt())
+  await toLoan.updateItemMetadata()
+  await toLoan.save()
+
+  const txData: Omit<BorrowerTransactionData, 'loanId'> = {
+    poolId: poolId.toString(),
+    //loanId: loanId.toString(),
+    address: account.id,
+    epochNumber: pool.currentEpoch,
+    hash: event.extrinsic.extrinsic.hash.toString(),
+    timestamp: event.block.timestamp,
+    amount: amount.toBigInt(),
+  }
+
+  const repaidBt = await BorrowerTransactionService.repaid({ ...txData, loanId: fromLoanId.toString() })
+  await repaidBt.save()
+
+  const borrowedBt = await BorrowerTransactionService.borrowed({ ...txData, loanId: fromLoanId.toString() })
+  await borrowedBt.save()
+
 }
