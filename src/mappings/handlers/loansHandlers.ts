@@ -7,7 +7,7 @@ import {
   LoanRepaidEvent,
   LoanWrittenOffEvent,
 } from '../../helpers/types'
-import { errorHandler } from '../../helpers/errorHandler'
+import { errorHandler, missingPool } from '../../helpers/errorHandler'
 import { PoolService } from '../services/poolService'
 import { LoanService } from '../services/loanService'
 import { BorrowerTransactionData, BorrowerTransactionService } from '../services/borrowerTransactionService'
@@ -22,7 +22,7 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedEvent>) {
   logger.info(`Loan created event for pool: ${poolId.toString()} loan: ${loanId.toString()}`)
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toHex(), EvmAccountService)
 
@@ -83,7 +83,7 @@ async function _handleLoanBorrowed(event: SubstrateEvent<LoanBorrowedEvent>): Pr
   const [poolId, loanId, borrowAmount] = event.event.data
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   const amount = borrowAmount.isInternal
     ? borrowAmount.asInternal.toString()
@@ -129,7 +129,7 @@ async function _handleLoanRepaid(event: SubstrateEvent<LoanRepaidEvent>) {
   const [poolId, loanId, { principal, interest, unscheduled }] = event.event.data
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   const principalAmount = principal.isInternal
     ? principal.asInternal
@@ -183,7 +183,7 @@ async function _handleLoanWrittenOff(event: SubstrateEvent<LoanWrittenOffEvent>)
   await loan.save()
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   await pool.increaseWriteOff(loan.writtenOffAmountByPeriod)
   await pool.save()
@@ -195,7 +195,7 @@ async function _handleLoanClosed(event: SubstrateEvent<LoanClosedEvent>) {
   logger.info(`Loan closed event for pool: ${poolId.toString()} loanId: ${loanId.toString()}`)
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toHex(), EvmAccountService)
 
@@ -220,7 +220,7 @@ async function _handleLoanDebtTransferred(event: SubstrateEvent<LoanDebtTransfer
   const [poolId, fromLoanId, toLoanId, amount] = event.event.data
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw new Error('Pool not found!')
+  if (pool === undefined) throw missingPool
 
   logger.info(
     `Loan debt transferred event for pool: ${poolId.toString()}, from loan: ${fromLoanId.toString()} ` +

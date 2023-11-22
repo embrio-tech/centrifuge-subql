@@ -343,7 +343,7 @@ export type InvestOrdersCollectedEvent = ITuple<
   ]
 >
 export type RedeemOrdersCollectedEvent = ITuple<
-  [investmentId: TrancheCurrency, who: AccountId32, collections: Vec<u64>, outcome: RedeemCollection, Enum]
+  [investmentId: TrancheCurrency, who: AccountId32, collections: Vec<u64>, collection: RedeemCollection, outcome: Enum]
 >
 export type OrderUpdatedEvent = ITuple<
   [investmentId: TrancheCurrency, submittedAt: u64, who: AccountId32, amount: u128]
