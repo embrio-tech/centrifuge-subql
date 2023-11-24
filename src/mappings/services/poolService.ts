@@ -6,6 +6,10 @@ import { ExtendedRpc, LoanInfoActive, NavDetails, PoolDetails, PoolMetadata, Tra
 import { Pool } from '../../types'
 
 export class PoolService extends Pool {
+  static seed(poolId: string) {
+    return new this(`${poolId}`, 'ALL', false)
+  }
+
   static init(
     poolId: string,
     currencyId: string,
@@ -15,26 +19,28 @@ export class PoolService extends Pool {
     timestamp: Date,
     blockNumber: number
   ) {
-    const pool = new this(
-      poolId,
-      'ALL',
-      timestamp,
-      blockNumber,
-      currencyId,
-      '',
-      minEpochTime,
-      maxPortfolioValuationAge,
-      1,
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      maxReserve,
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      BigInt(0)
-    )
+    const pool = new this(poolId, 'ALL', true)
+
+    pool.createdAt = timestamp
+    pool.createdAtBlockNumber = blockNumber
+    pool.currencyId = currencyId
+
+    pool.minEpochTime = minEpochTime
+    pool.maxPortfolioValuationAge = maxPortfolioValuationAge
+
+    pool.currentEpoch = 1
+
+    pool.portfolioValuation = BigInt(0)
+    pool.totalReserve = BigInt(0)
+    pool.availableReserve = BigInt(0)
+    pool.maxReserve = maxReserve
+
+    pool.sumDebt = BigInt(0)
+    pool.value = BigInt(0)
+
+    pool.sumNumberOfActiveLoans = BigInt(0)
+    pool.sumDebtOverdue = BigInt(0)
+    pool.sumDebtWrittenOffByPeriod = BigInt(0)
 
     pool.sumBorrowedAmountByPeriod = BigInt(0)
     pool.sumRepaidAmountByPeriod = BigInt(0)
@@ -71,6 +77,11 @@ export class PoolService extends Pool {
 
   static async getAll() {
     const pools = (await paginatedGetter('Pool', 'type', 'ALL')) as PoolService[]
+    return pools.map((pool) => this.create(pool) as PoolService)
+  }
+
+  static async getActivePools() {
+    const pools = (await paginatedGetter('Pool', 'isActive', true)) as PoolService[]
     return pools.map((pool) => this.create(pool) as PoolService)
   }
 

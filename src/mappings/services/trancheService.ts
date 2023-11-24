@@ -4,26 +4,38 @@ import { paginatedGetter } from '../../helpers/paginatedGetter'
 import { WAD } from '../../config'
 import { ExtendedRpc, TrancheDetails } from '../../helpers/types'
 import { Tranche, TrancheSnapshot } from '../../types'
-import { TrancheProps } from '../../types/models/Tranche'
+import  { TrancheProps } from '../../types/models/Tranche'
 
 export class TrancheService extends Tranche {
+
+  static seed(poolId: string, trancheId: string) {
+    return new this(
+      `${poolId}-${trancheId}`,
+      'ALL',
+      poolId,
+      trancheId
+    )
+  }
+
   static init(poolId: string, trancheId: string, index: number, trancheData: TrancheDetails) {
     const tranche = new this(
       `${poolId}-${trancheId}`,
-      index,
       'ALL',
       poolId,
-      trancheId,
-      trancheData.trancheType.isResidual,
-      trancheData.seniority.toNumber(),
-      true,
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      BigInt(0),
-      BigInt(0)
+      trancheId
     )
+
+    tranche.index = index
+    tranche.isResidual = trancheData.trancheType.isResidual
+    ;(tranche.seniority = trancheData.seniority.toNumber()), (tranche.isActive = true)
+
+    tranche.sumOutstandingInvestOrdersByPeriod = BigInt(0)
+    tranche.sumOutstandingRedeemOrdersByPeriod = BigInt(0)
+    tranche.sumOutstandingRedeemOrdersCurrencyByPeriod = BigInt(0)
+    tranche.sumFulfilledInvestOrdersByPeriod = BigInt(0)
+    tranche.sumFulfilledRedeemOrdersByPeriod = BigInt(0)
+    tranche.sumFulfilledRedeemOrdersCurrencyByPeriod = BigInt(0)
+
     tranche.tokenPrice = nToBigInt(WAD)
     tranche.sumDebt = trancheData.debt.toBigInt()
 

@@ -21,7 +21,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
     const daysAgo90 = new Date(blockPeriodStart.valueOf() - 90 * 24 * 3600 * 1000)
 
     // Update Pool States
-    const pools = await PoolService.getAll()
+    const pools = await PoolService.getActivePools()
     for (const pool of pools) {
       await pool.updateState()
       await pool.updatePortfolioValuation()
