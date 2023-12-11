@@ -269,12 +269,6 @@ type Account @entity {
   currencyBalances: [CurrencyBalance] @derivedFrom(field: "account")
 }
 
-type EvmAccount @entity {
-  id: ID! #Address
-  account: Account! @index
-  chainId: Int!
-}
-
 type TrancheBalance @entity {
   id: ID! # address - pool id - tranche id
   account: Account! @index
@@ -288,14 +282,6 @@ type TrancheBalance @entity {
   sumRedeemOrderedAmount: BigInt!
   sumRedeemUncollectedAmount: BigInt!
   sumRedeemCollectedAmount: BigInt!
-}
-
-type CurrencyBalance @entity {
-  id: ID! # address - currencyId
-  account: Account! @index
-
-  currency: Currency!
-  amount: BigInt!
 }
 
 enum LoanStatus {
@@ -379,12 +365,17 @@ type Proxy @entity {
 type Currency @entity {
   id: ID!
   decimals: Int!
+
+  chainId: Int
+  tokenAddress: address
+  pool: Pool
+  tranche: Tranche
 }
 
-type EvmTrancheToken @entity {
-  id: ID!
-  chainId: Int!
+type CurrencyBalance @entity {
+  id: ID! # address - currencyId
+  account: Account! @index
 
-  pool: Pool!
-  tranche: Tranche!
+  currency: Currency!
+  amount: BigInt!
 }

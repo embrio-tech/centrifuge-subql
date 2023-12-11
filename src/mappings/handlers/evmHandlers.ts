@@ -42,17 +42,19 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const chainId = parseInt(event.transaction.chainId, 10)
 
   const evmToken = await EvmTrancheTokenService.getById(evmTokenAddress)
+  if (!evmToken) throw new Error('Unregistered EVM Token')
 
-  const orderData: Omit<InvestorTransactionData,'address'> = {
+  const orderData: Omit<InvestorTransactionData, 'address'> = {
     poolId: evmToken.poolId,
     trancheId: evmToken.trancheId,
     //epochNumber: pool.currentEpoch,
     hash: event.transactionHash,
-    timestamp: new Date(Number(event.block.timestamp)*1000),
+    timestamp: new Date(Number(event.block.timestamp) * 1000),
     //price: tranche.tokenPrice,
     amount: amount.toBigInt(),
   }
 
+  let fromAccount: AccountService = undefined
   if (fromEvmAddress.toString() !== evmTokenAddress) {
     const fromAddress = EvmAccountService.convertToSubstrate(fromEvmAddress.toString(), chainId)
 
@@ -66,7 +68,6 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
       )
     ).pop()
 
-    let fromAccount: AccountService = undefined
     if (fromEvmAccount) {
       fromAccount = (await AccountService.get(fromEvmAccount.accountId)) as AccountService
     } else {
@@ -77,6 +78,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     await txOut.save()
   }
 
+  let toAccount: AccountService = undefined
   if (toEvmAddress.toString() !== evmTokenAddress) {
     const toAddress = EvmAccountService.convertToSubstrate(toEvmAddress.toString(), chainId)
 
@@ -90,7 +92,6 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
       )
     ).pop()
 
-    let toAccount: AccountService = undefined
     if (toEvmAccount) {
       toAccount = (await AccountService.get(toEvmAccount.accountId)) as AccountService
     } else {
