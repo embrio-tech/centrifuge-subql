@@ -385,5 +385,4 @@ type CurrencyBalance @entity {
 
 type Blockchain @entity {
   id: ID! #EVM chainId
-
 }
