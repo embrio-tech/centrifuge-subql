@@ -258,7 +258,7 @@ type BorrowerTransaction @entity {
 
 type Account @entity {
   id: ID!
-  chainId: Blockchain!
+  chain: Blockchain!
   evmAddress: String
 
   pureProxies: [PureProxy] @derivedFrom(field: "account")
@@ -368,8 +368,8 @@ type Currency @entity {
   id: ID! #TODO: ID format for currencies
   decimals: Int!
 
-  chainId: Blockchain!
-  tokenAddress: address
+  chain: Blockchain!
+  tokenAddress: String
 
   pool: Pool
   tranche: Tranche

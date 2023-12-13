@@ -2,12 +2,11 @@ import { createTrancheTrackerDatasource } from '../../types'
 import { errorHandler } from '../../helpers/errorHandler'
 import { DeployTrancheLog } from '../../types/abi-interfaces/PoolManagerAbi'
 import { TransferLog } from '../../types/abi-interfaces/Erc20Abi'
-import { EvmAccountService } from '../services/evmAccountService'
 import { AccountService } from '../services/accountService'
 import { PoolService } from '../services/poolService'
 import { TrancheService } from '../services/trancheService'
-import { EvmTrancheTokenService } from '../services/evmTrancheTokenService'
 import { InvestorTransactionData, InvestorTransactionService } from '../services/investorTransactionService'
+import { CurrencyService } from '../services/currencyService'
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
@@ -41,7 +40,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const evmTokenAddress = event.address
   const chainId = parseInt(event.transaction.chainId, 10)
 
-  const evmToken = await EvmTrancheTokenService.getById(evmTokenAddress)
+  const evmToken = await CurrencyService.getOrInit(evmTokenAddress)
   if (!evmToken) throw new Error('Unregistered EVM Token')
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
@@ -54,50 +53,16 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     amount: amount.toBigInt(),
   }
 
-  let fromAccount: AccountService = undefined
   if (fromEvmAddress.toString() !== evmTokenAddress) {
-    const fromAddress = EvmAccountService.convertToSubstrate(fromEvmAddress.toString(), chainId)
-
-    let fromEvmAccount = (
-      await EvmAccountService.getByFields(
-        [
-          ['id', '=', fromEvmAddress.toString()],
-          ['chainId', '=', chainId],
-        ],
-        { limit: 1 }
-      )
-    ).pop()
-
-    if (fromEvmAccount) {
-      fromAccount = (await AccountService.get(fromEvmAccount.accountId)) as AccountService
-    } else {
-      fromAccount = await AccountService.getOrInit(fromAddress)
-      fromEvmAccount = new EvmAccountService(fromEvmAddress, fromAccount.id, chainId)
-    }
+    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress.toString(), chainId)
+    const fromAccount = await AccountService.getOrInit(fromAddress)
     const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
     await txOut.save()
   }
 
-  let toAccount: AccountService = undefined
   if (toEvmAddress.toString() !== evmTokenAddress) {
-    const toAddress = EvmAccountService.convertToSubstrate(toEvmAddress.toString(), chainId)
-
-    let toEvmAccount = (
-      await EvmAccountService.getByFields(
-        [
-          ['id', '=', toEvmAddress.toString()],
-          ['chainId', '=', chainId],
-        ],
-        { limit: 1 }
-      )
-    ).pop()
-
-    if (toEvmAccount) {
-      toAccount = (await AccountService.get(toEvmAccount.accountId)) as AccountService
-    } else {
-      toAccount = await AccountService.getOrInit(toAddress)
-      toEvmAccount = new EvmAccountService(toEvmAddress, toAccount.id, chainId)
-    }
+    const toAddress = AccountService.evmToSubstrate(toEvmAddress.toString(), chainId)
+    const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferOut({ ...orderData, address: toAccount.id })
     await txIn.save()
   }
