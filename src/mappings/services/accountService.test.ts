@@ -2,7 +2,7 @@ import { AccountService } from './accountService'
 
 test('Account is created in database', async () => {
   const id = 'ABCDE'
-  const account = AccountService.init(id)
+  const account = await AccountService.init(id)
   await account.save()
 
   expect(logger.info).toHaveBeenCalled()

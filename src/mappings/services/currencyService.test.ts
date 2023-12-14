@@ -9,15 +9,17 @@ const usdDecimals = 12
 const stdDecimals = 18
 
 test('AUSD is initialised with 12 decimals', async () => {
+  const chainId = '2030'
   const ticker = 'AUSD'
-  await CurrencyService.getOrInit(ticker)
+  await CurrencyService.getOrInit(chainId, ticker)
 
   expect(store.set).toBeCalledWith(entityName, ticker, { id: ticker, decimals: usdDecimals })
 })
 
 test('ACA is initialised with 18 decimals', async () => {
+  const chainId = '2030'
   const ticker = 'ACA'
-  await CurrencyService.getOrInit(ticker)
+  await CurrencyService.getOrInit(chainId, ticker)
 
   expect(store.set).toBeCalledWith(entityName, ticker, { id: ticker, decimals: stdDecimals })
 })

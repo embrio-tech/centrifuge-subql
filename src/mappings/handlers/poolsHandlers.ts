@@ -18,8 +18,8 @@ async function _handlePoolCreated(event: SubstrateEvent<PoolCreatedEvent>): Prom
   )
 
   const currencyTicker = essence.currency.type
-  const currencyId = essence.currency.value.toString()
-  const currency = await CurrencyService.getOrInit(currencyTicker, currencyId)
+  const currencyValue = essence.currency.value.toString()
+  const currency = await CurrencyService.getOrInit(currencyTicker, currencyValue)
 
   // Initialise Pool
   const pool = await PoolService.init(

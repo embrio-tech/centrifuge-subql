@@ -7,6 +7,7 @@ import { PoolService } from '../services/poolService'
 import { TrancheService } from '../services/trancheService'
 import { InvestorTransactionData, InvestorTransactionService } from '../services/investorTransactionService'
 import { CurrencyService } from '../services/currencyService'
+import { BlockchainService } from '../services/blockchainService'
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
@@ -38,9 +39,10 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   logger.info(`Transfer ${fromEvmAddress.toString()}-${toEvmAddress.toString()} of ${amount.toString()}`)
 
   const evmTokenAddress = event.address
-  const chainId = parseInt(event.transaction.chainId, 10)
+  const chainId = event.transaction.chainId
+  const blockchain = await BlockchainService.getOrInit(chainId)
 
-  const evmToken = await CurrencyService.getOrInit(evmTokenAddress)
+  const evmToken = await CurrencyService.getOrInit(blockchain.id, evmTokenAddress)
   if (!evmToken) throw new Error('Unregistered EVM Token')
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
@@ -54,14 +56,14 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   }
 
   if (fromEvmAddress.toString() !== evmTokenAddress) {
-    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress.toString(), chainId)
+    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress.toString(), blockchain.id)
     const fromAccount = await AccountService.getOrInit(fromAddress)
     const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
     await txOut.save()
   }
 
   if (toEvmAddress.toString() !== evmTokenAddress) {
-    const toAddress = AccountService.evmToSubstrate(toEvmAddress.toString(), chainId)
+    const toAddress = AccountService.evmToSubstrate(toEvmAddress.toString(), blockchain.id)
     const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferOut({ ...orderData, address: toAccount.id })
     await txIn.save()

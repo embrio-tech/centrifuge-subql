@@ -25,8 +25,8 @@ export class AccountService extends Account {
     return account
   }
 
-  static evmToSubstrate(evmAddress: string, chainId: number) {
-    const chainHex = chainId.toString(16).padStart(4, '0')
+  static evmToSubstrate(evmAddress: string, chainId: string) {
+    const chainHex = parseInt(chainId,10).toString(16).padStart(4, '0')
     return `0x${evmAddress.substring(2).toLowerCase()}000000000000${chainHex}${EVM_SUFFIX}`
   }
 
