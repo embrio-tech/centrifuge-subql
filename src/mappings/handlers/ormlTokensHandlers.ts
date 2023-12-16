@@ -1,9 +1,9 @@
 import { SubstrateEvent } from '@subql/types'
 import { errorHandler, missingPool } from '../../helpers/errorHandler'
-import { TokensCurrencyId, TokensEndowedDepositedWithdrawnEvent, TokensTransferEvent } from '../../helpers/types'
+import { TokensEndowedDepositedWithdrawnEvent, TokensTransferEvent } from '../../helpers/types'
 import { AccountService } from '../services/accountService'
 import { CurrencyBalanceService } from '../services/currencyBalanceService'
-import { CurrencyService } from '../services/currencyService'
+import { CurrencyService, currencyFormatters } from '../services/currencyService'
 import { InvestorTransactionService } from '../services/investorTransactionService'
 import { PoolService } from '../services/poolService'
 import { TrancheService } from '../services/trancheService'
@@ -92,63 +92,60 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
 
 export const handleTokenEndowed = errorHandler(_handleTokenEndowed)
 async function _handleTokenEndowed(event: SubstrateEvent<TokensEndowedDepositedWithdrawnEvent>): Promise<void> {
-  const [currency, address, amount] = event.event.data
-  if (currency.isTranche) return
+  const [_currency, address, amount] = event.event.data
+  if (_currency.isTranche) return
   logger.info(
-    `Currency endowment in ${currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
+    `Currency endowment in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const currencyTicker = currency.type
-  const currencyId = currency.value.toString()
-  const currencyService = await CurrencyService.getOrInit(currencyTicker, currencyId)
+  const blockchain = await BlockchainService.getOrInit()
+  const currency = await CurrencyService.getOrInit(
+    blockchain.id,
+    _currency.type,
+    ...currencyFormatters[_currency.type](_currency.value)
+  )
   const toAccount = await AccountService.getOrInit(address.toHex())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyService.id)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
   await toCurrencyBalance.credit(amount.toBigInt())
   await toCurrencyBalance.save()
 }
 
 export const handleTokenDeposited = errorHandler(_handleTokenDeposited)
 async function _handleTokenDeposited(event: SubstrateEvent<TokensEndowedDepositedWithdrawnEvent>): Promise<void> {
-  const [currency, address, amount] = event.event.data
-  if (currency.isTranche) return
+  const [_currency, address, amount] = event.event.data
+  if (_currency.isTranche) return
   logger.info(
-    `Currency deposit in ${currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
+    `Currency deposit in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const currencyTicker = currency.type
-  const currencyId = currency.value.toString()
-  const currencyService = await CurrencyService.getOrInit(currencyTicker, currencyId)
+  const blockchain = await BlockchainService.getOrInit()
+  const currency = await CurrencyService.getOrInit(
+    blockchain.id,
+    _currency.type,
+    ...currencyFormatters[_currency.type](_currency.value)
+  )
   const toAccount = await AccountService.getOrInit(address.toHex())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyService.id)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
   await toCurrencyBalance.credit(amount.toBigInt())
   await toCurrencyBalance.save()
 }
 
 export const handleTokenWithdrawn = errorHandler(_handleTokenWithdrawn)
 async function _handleTokenWithdrawn(event: SubstrateEvent<TokensEndowedDepositedWithdrawnEvent>): Promise<void> {
-  const [currency, address, amount] = event.event.data
-  if (currency.isTranche) return
+  const [_currency, address, amount] = event.event.data
+  if (_currency.isTranche) return
   logger.info(
-    `Currency withdrawal in ${currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
+    `Currency withdrawal in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const currencyTicker = currency.type
-  const currencyId = currency.value.toString()
-  const currencyService = await CurrencyService.getOrInit(currencyTicker, currencyId)
+  const blockchain = await BlockchainService.getOrInit()
+  const currency = await CurrencyService.getOrInit(
+    blockchain.id,
+    _currency.type,
+    ...currencyFormatters[_currency.type](_currency.value)
+  )
   const toAccount = await AccountService.getOrInit(address.toHex())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currencyService.id)
+  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
   await toCurrencyBalance.debit(amount.toBigInt())
   await toCurrencyBalance.save()
-}
-
-const currencyFormatters: CurrencyFormatters = {
-  AUSD: () => [],
-  ForeignAsset: (value) => [value.toString(10)],
-  Native: () => [],
-  Staking: () => ['BlockRewards'],
-  Tranche: (value) => [value[0].toString(10), value[1].toHex()],
-}
-
-type CurrencyFormatters = {
-  [K in keyof TokensCurrencyId as K extends `as${infer R}` ? R : never]: (value: TokensCurrencyId[K]) => string[]
 }
