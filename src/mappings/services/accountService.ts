@@ -1,6 +1,7 @@
 import { Account } from '../../types/models/Account'
 
 const EVM_SUFFIX = '45564d00'
+const thisChainId = '2030'
 
 export class AccountService extends Account {
   static async init(address: string) {
@@ -11,8 +12,7 @@ export class AccountService extends Account {
       account.evmAddress = address.substring(0, 42)
       return account
     } else {
-      const chainId = (await api.rpc.eth.chainId()).toString()
-      return new this(address, chainId)
+      return new this(address, thisChainId)
     }
   }
 

@@ -1802,10 +1802,17 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.52.0.tgz#78fe5f117840f69dc4a353adf9b9cd926353378c"
   integrity sha512-mjZVbpaeMZludF2fsWLD0Z9gCref1Tk4i9+wddjRvpUNqqcndPkBD09N/Mapey0b3jaXbLm2kICwFv2E64QinA==
 
+<<<<<<< HEAD
 "@eslint/js@8.55.0":
   version "8.55.0"
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.55.0.tgz#b721d52060f369aa259cf97392403cb9ce892ec6"
   integrity sha512-qQfo2mxH5yVom1kacMtZZJFVdW+E70mqHMJvVg6WTLo+VBuQJ4TojZlfWBjK0ve5BdEeNAVxOsl/nvNMpJOaJA==
+=======
+"@eslint/js@8.56.0":
+  version "8.56.0"
+  resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.56.0.tgz#ef20350fec605a7f7035a01764731b2de0f3782b"
+  integrity sha512-gMsVel9D7f2HLkBma9VbtzZRehRogVRfbr++f06nL2vnCGCNlzOD+/MUov/F4p8myyAHspEhVobgjpX64q5m6A==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 "@ethersproject/abi@5.7.0", "@ethersproject/abi@^5.7.0":
   version "5.7.0"
@@ -2150,9 +2157,15 @@
     "@ethersproject/strings" "^5.7.0"
 
 "@grpc/grpc-js@^1.3.4":
+<<<<<<< HEAD
   version "1.9.12"
   resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.12.tgz#a45b23a7d9ee1eadc9fa8fe480e27edbc6544cdd"
   integrity sha512-Um5MBuge32TS3lAKX02PGCnFM4xPT996yLgZNb5H03pn6NyJ4Iwn5YcPq6Jj9yxGRk7WOgaZFtVRH5iTdYBeUg==
+=======
+  version "1.9.13"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.13.tgz#ad9b7dbb6089c462469653c809996f13e46aa1cd"
+  integrity sha512-OEZZu9v9AA+7/tghMDE8o5DAMD5THVnwSqDWuh7PPYO5287rTyqy0xEHT6/e4pbqSrhyLPdQFsam4TwFQVVIIw==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     "@grpc/proto-loader" "^0.7.8"
     "@types/node" ">=12.12.47"
@@ -2554,6 +2567,7 @@
   resolved "https://registry.yarnpkg.com/@noble/ed25519/-/ed25519-1.7.3.tgz#57e1677bf6885354b466c38e2b620c62f45a7123"
   integrity sha512-iR8GBkDt0Q3GyaVcIu7mSsVIqnFbkbRzGLWlvhwunacoLwt4J3swfKhfaM6rN6WY+TBGoYT1GtT1mIh2/jGbRQ==
 
+<<<<<<< HEAD
 "@noble/hashes@1.3.3", "@noble/hashes@^1.3.2":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
@@ -2563,6 +2577,12 @@
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
+=======
+"@noble/hashes@1.3.3", "@noble/hashes@^1", "@noble/hashes@^1.0.0", "@noble/hashes@^1.3.2", "@noble/hashes@~1.3.2":
+  version "1.3.3"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
+  integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3193,6 +3213,7 @@
     mz "^2.7.0"
     prettier "^2.6.2"
 
+<<<<<<< HEAD
 "@scure/base@^1.1.3":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.4.tgz#cb6a3552ee15595d9864a0a4e89ffcd21ebe8c39"
@@ -3202,14 +3223,20 @@
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.3.tgz#8584115565228290a6c6c4961973e0903bb3df2f"
   integrity sha512-/+SgoRjLq7Xlf0CWuLHq2LUZeL/w65kfzAPG5NH9pcmBhs+nunQTn4gvdwgMTIXnt9b2C/1SeL2XiysZEyIC9Q==
+=======
+"@scure/base@^1.1.3", "@scure/base@~1.1.4":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.5.tgz#1d85d17269fe97694b9c592552dd9e5e33552157"
+  integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 "@scure/bip39@^1.1.0":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@scure/bip39/-/bip39-1.2.1.tgz#5cee8978656b272a917b7871c981e0541ad6ac2a"
-  integrity sha512-Z3/Fsz1yr904dduJD0NpiyRHhRYHdcnyh73FZWiV+/qhWi83wNJ3NWolYqCEN+ZWsUz2TWwajJggcRE9r1zUYg==
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@scure/bip39/-/bip39-1.2.2.tgz#f3426813f4ced11a47489cbcf7294aa963966527"
+  integrity sha512-HYf9TUXG80beW+hGAt3TRM8wU6pQoYur9iNypTROm42dorCGmLnFe3eWjz3gOq6G62H2WRh0FCzAR1PI+29zIA==
   dependencies:
-    "@noble/hashes" "~1.3.0"
-    "@scure/base" "~1.1.0"
+    "@noble/hashes" "~1.3.2"
+    "@scure/base" "~1.1.4"
 
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"
@@ -3241,6 +3268,7 @@
     "@sinonjs/commons" "^3.0.0"
 
 "@subql/cli@^4.1.0":
+<<<<<<< HEAD
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@subql/cli/-/cli-4.2.3.tgz#89a6a689b0b3ed7e68dc2efb81f6da2df006ec6f"
   integrity sha512-J+q4kBw8gmQgG6NUG9UXKVgaq8Y0ots525D7wzwRk2PGnaT5bUIkXYOJPb2PclK2pBxLkP0ECaVpTyQI3pJT9g==
@@ -3255,6 +3283,22 @@
     "@subql/common-near" "^3.0.0"
     "@subql/common-stellar" "^3.0.0"
     "@subql/common-substrate" "3.2.0"
+=======
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/@subql/cli/-/cli-4.2.4.tgz#389b2f06986d45e2871e3d6cb9b3364c97e6aef9"
+  integrity sha512-jkO9z4JusJMQR6TRh5EsERyre/2lvLHqBpAu9LQGIU0mlIUsb0EQFUuioghani8DsPTwwwdyodgszDPdYjz9Jw==
+  dependencies:
+    "@oclif/core" "^2.15.0"
+    "@subql/common" "3.3.1"
+    "@subql/common-algorand" "^3.1.0"
+    "@subql/common-concordium" "^3.3.2"
+    "@subql/common-cosmos" "^4.0.0"
+    "@subql/common-ethereum" "^3.1.0"
+    "@subql/common-flare" "^3.1.0"
+    "@subql/common-near" "^3.0.1"
+    "@subql/common-stellar" "^3.0.0"
+    "@subql/common-substrate" "3.2.1"
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
     "@subql/utils" "2.6.1-0"
     algosdk "^1.19.0"
     boxen "5.1.2"
@@ -3281,7 +3325,7 @@
     yaml "^2.2.2"
     yaml-loader "^0.6.0"
 
-"@subql/common-algorand@^3.0.0":
+"@subql/common-algorand@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@subql/common-algorand/-/common-algorand-3.1.0.tgz#54cd3e5798621ac14ab580a65d8a6b51359ad501"
   integrity sha512-z9igi6B+iizDmDMkm9I9e+C0PutMd9p4cr5dxPHU5gALjAHC6H6ashWOMwd8alW0TixoPl7HPpZKfjCyCBmZiQ==
@@ -3296,7 +3340,11 @@
     reflect-metadata "^0.1.13"
     semver "^7.5.2"
 
+<<<<<<< HEAD
 "@subql/common-concordium@^3.1.3":
+=======
+"@subql/common-concordium@^3.3.2":
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/@subql/common-concordium/-/common-concordium-3.3.2.tgz#77b0cd05886c786ef9e730268474998f1c6bc2d5"
   integrity sha512-jA2m/hdyu/EGCdr+sHfQAgRdrVJch6GSZp8yS9KbVXJHo6/z0e23r9NTHo+ogevSOBghke+MIXinwf7UvJjOww==
@@ -3308,10 +3356,17 @@
     pino "^6.13.3"
     reflect-metadata "^0.1.13"
 
+<<<<<<< HEAD
 "@subql/common-cosmos@^3.0.1":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@subql/common-cosmos/-/common-cosmos-3.2.1.tgz#8399c7830a5a19d4fe0cad55f29decc316c4cd95"
   integrity sha512-gjwmXbj9CX7/YTBf+opzRCPczlMzV920i+VGRwOCw+6k2z+P28Ia0mJVkWFHQ4+MmUypy+r6JHwg5FAPDbocYw==
+=======
+"@subql/common-cosmos@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@subql/common-cosmos/-/common-cosmos-4.0.0.tgz#d5fa555bf3cec8e426d85b38a096006672fdaeef"
+  integrity sha512-/biU3nOwk2LqzN3Bufpwqq/Qg9K52FWk9U/UGkSGLpqWLXZO1HtxhjFn78BoJye333IJsrhQCtKzMsit8Dvtsw==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     "@cosmology/telescope" "^0.104.0"
     "@cosmwasm/ts-codegen" "^0.35.3"
@@ -3322,13 +3377,18 @@
     "@protobufs/google" "^0.0.10"
     "@protobufs/ibc" "^0.1.0"
     "@protobufs/tendermint" "^0.0.10"
+<<<<<<< HEAD
     "@subql/common" "^3.3.0"
     "@subql/types-cosmos" "3.2.1"
+=======
+    "@subql/common" "^3.3.1"
+    "@subql/types-cosmos" "3.2.2"
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
     fs-extra "^11.1.1"
     js-yaml "^4.1.0"
     reflect-metadata "^0.1.13"
 
-"@subql/common-ethereum@^3.0.2":
+"@subql/common-ethereum@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@subql/common-ethereum/-/common-ethereum-3.1.0.tgz#ed46c4e8b6747e8b5c02d6037c588af8b01f179c"
   integrity sha512-8ym5/6VAXnLBncDl/4kJ/fy1QkhH3CsPCuVa9atHJvHeYSdJc0qsyHaVBO0IEPt0ilcuI5nxUIDrisc2LGpGDQ==
@@ -3341,7 +3401,7 @@
     reflect-metadata "^0.1.13"
     typechain "^8.3.1"
 
-"@subql/common-flare@^3.0.1":
+"@subql/common-flare@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@subql/common-flare/-/common-flare-3.1.0.tgz#635553381203be4023afbabef24f8c44ae570ab0"
   integrity sha512-1YzIoYEAdlYVEyw6rXNesoM8WP4fBpEcova6kwWBF2oWlUYyY5tXpwPxeztjV6EpW1rNBJ2xjoWXElb+Vkaj+Q==
@@ -3354,7 +3414,7 @@
     reflect-metadata "^0.1.13"
     typechain "^8.3.1"
 
-"@subql/common-near@^3.0.0":
+"@subql/common-near@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@subql/common-near/-/common-near-3.0.1.tgz#d0aad6b86727c92f200be473cf7d02e165cbed98"
   integrity sha512-JFsG7AGqKtAUHLgS9/ZL7D5rACKfXfwnUNLoP1eH9YHmPVvHQAkhNmYpahE/qmw9Bf71P+e9ysMflyH935I5GA==
@@ -3376,22 +3436,29 @@
     reflect-metadata "^0.1.13"
     stellar-sdk "^10.4.1"
 
-"@subql/common-substrate@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@subql/common-substrate/-/common-substrate-3.2.0.tgz#0679841aa1a5cae2dfaae11c24aaee398cfb3c67"
-  integrity sha512-AIvrTIxmMXYOkclq2PUmTbmDFh91MNndUHyM6xbQYlCc08twosbtMe0SXpM+xOB2wZ2X6e9gFCNyn9robwVawA==
+"@subql/common-substrate@3.2.1":
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/@subql/common-substrate/-/common-substrate-3.2.1.tgz#6e9dcf7271a3e321fd5d73ada429ad04b54b3913"
+  integrity sha512-JdukD5YRvQHYReTWuM12QDRbps2u2k2f1lQVybc9zGVuRlOxuiysuQjjYlTjNkdEW98sgw9tQomhp4bF3ZYLpQ==
   dependencies:
-    "@subql/common" "3.3.0"
+    "@subql/common" "3.3.1"
     "@subql/types" "3.3.0"
     js-yaml "^4.1.0"
     reflect-metadata "^0.1.13"
 
+<<<<<<< HEAD
 "@subql/common@3.3.0", "@subql/common@^3.1.1", "@subql/common@^3.2.0", "@subql/common@^3.3.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@subql/common/-/common-3.3.0.tgz#29122a430e34610e34e151b2cc7716b6f37919af"
   integrity sha512-uFPlNSg0LX6wEedUscJRzIccuKKJ30MjQV9u38AStSSknSmhtjhEVCyrgCwh9ve7HrgX0qagkyDs9FbmG32VpQ==
+=======
+"@subql/common@3.3.1", "@subql/common@^3.1.1", "@subql/common@^3.2.0", "@subql/common@^3.3.0", "@subql/common@^3.3.1":
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/@subql/common/-/common-3.3.1.tgz#d4038fbed29f857c41ef93704e3e431ba26a8614"
+  integrity sha512-Le3CWDOuH39kPndspYNHdbRx7y7XG0HfVmkzzaMxg1kxebWy7I+YHXJgquhNvgB6AzdoSRsfbhN7ZArBpgq8Ig==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
-    "@subql/types-core" "0.3.0"
+    "@subql/types-core" "0.4.0"
     axios "^0.27.2"
     class-transformer "^0.5.1"
     class-validator "^0.14.0"
@@ -3454,6 +3521,13 @@
   dependencies:
     package-json-type "^1.0.3"
 
+"@subql/types-core@0.4.0", "@subql/types-core@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@subql/types-core/-/types-core-0.4.0.tgz#56254b559ce357062f19aa22cf020a6477c231c0"
+  integrity sha512-SknwtffckOqLLaWUFOLZCLTRY/3PlwJLEZZMMW/xb0TQBCnixGS8njFWdk3kq+LqeGrnfhpIYS9HrPHsjfqsrQ==
+  dependencies:
+    package-json-type "^1.0.3"
+
 "@subql/types-core@^0.1.2-0":
   version "0.1.2-1"
   resolved "https://registry.yarnpkg.com/@subql/types-core/-/types-core-0.1.2-1.tgz#dbf25a517fba3ebbd979e673e072f4c7c7fca7e6"
@@ -3468,15 +3542,22 @@
   dependencies:
     package-json-type "^1.0.3"
 
+<<<<<<< HEAD
 "@subql/types-cosmos@3.2.1":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@subql/types-cosmos/-/types-cosmos-3.2.1.tgz#1edc405bc4a984b4c9935e5a8febe18c1756447d"
   integrity sha512-K/LbFXTzcx+v9GmWSn5f7IG1pQrxIsJI8xbPFd253Q4bADAmksMLRoLitBnO1iXcr/26PDOwcjfsDoGd7q1Eyg==
+=======
+"@subql/types-cosmos@3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@subql/types-cosmos/-/types-cosmos-3.2.2.tgz#33539f60665f646e3c57fbc71b6e28246a934b2d"
+  integrity sha512-+XnxTSBiFFP97RgVFS94HlerfVfdKXz0omVizLlgHT2S961qRUDt+DaWuzUphv4NvvJJPdn5+5YXtRrrz5P1LA==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     "@cosmjs/cosmwasm-stargate" "^0.30.1"
     "@cosmjs/proto-signing" "^0.30.1"
     "@cosmjs/stargate" "^0.30.1"
-    "@subql/types-core" "^0.3.0"
+    "@subql/types-core" "^0.4.0"
 
 "@subql/types-ethereum@3.2.0":
   version "3.2.0"
@@ -3677,9 +3758,15 @@
     "@types/estree" "*"
 
 "@types/eslint@*":
+<<<<<<< HEAD
   version "8.44.8"
   resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.44.8.tgz#f4fe1dab9b3d3dd98082d4b9f80e59ab40f1261c"
   integrity sha512-4K8GavROwhrYl2QXDXm0Rv9epkA8GBFu0EI+XrrnnuCl7u8CWBRusX7fXJfanhZTDWSAL24gDI/UqXyUM0Injw==
+=======
+  version "8.44.9"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.44.9.tgz#5799663009645637bd1c45b2e1a7c8f4caf89534"
+  integrity sha512-6yBxcvwnnYoYT1Uk2d+jvIfsuP4mb2EdIxFnrPABj5a/838qe5bGkNLFOiipX4ULQ7XVQvTxOh7jO+BTAiqsEw==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     "@types/estree" "*"
     "@types/json-schema" "*"
@@ -3790,9 +3877,15 @@
   integrity sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==
 
 "@types/node@*", "@types/node@>= 8", "@types/node@>=12.12.47", "@types/node@>=13.7.0":
+<<<<<<< HEAD
   version "20.10.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.10.4.tgz#b246fd84d55d5b1b71bf51f964bd514409347198"
   integrity sha512-D08YG6rr8X90YB56tSIuBaddy/UXAA9RKJoFvrsnogAum/0pmjkgi4+2nx96A330FmioegBWmEYQ+syqCFaveg==
+=======
+  version "20.10.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.10.5.tgz#47ad460b514096b7ed63a1dae26fad0914ed3ab2"
+  integrity sha512-nNPsNE65wjMxEKI93yOP+NPGGBJz/PoN3kZsVLee0XMiJolxSekEVD8wRwBUBqkwc7UWop0edW50yrCQW4CyRw==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     undici-types "~5.26.4"
 
@@ -4388,7 +4481,11 @@ axios@^0.27.2:
     follow-redirects "^1.14.9"
     form-data "^4.0.0"
 
+<<<<<<< HEAD
 axios@^1.4.0, axios@^1.6.0:
+=======
+axios@^1.4.0:
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.6.2.tgz#de67d42c755b571d3e698df1b6504cde9b0ee9f2"
   integrity sha512-7i24Ri4pmDRfJTR7LDBhsOTtcm+9kjX5WiY1X3wIisx6G9So3pfMkEiU7emUBe46oceVImccTEM3k6C5dbVW8A==
@@ -4787,9 +4884,15 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001565:
+<<<<<<< HEAD
   version "1.0.30001568"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001568.tgz#53fa9297273c9a977a560663f48cbea1767518b7"
   integrity sha512-vSUkH84HontZJ88MiNrOau1EBrCqEQYgkC5gIySiDlpsm8sGVrhU7Kx4V6h0tnqaHzIHZv08HlJIwPbL4XL9+A==
+=======
+  version "1.0.30001570"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001570.tgz#b4e5c1fa786f733ab78fc70f592df6b3f23244ca"
+  integrity sha512-+3e0ASu4sw1SWaoCtvPeyXp+5PsjigkSt8OXZbF9StH5pQWbxEjLAZE3n8Aup5udop1uRiKA7a4utUk/uoSpUw==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 capability@^0.2.5:
   version "0.2.5"
@@ -5578,9 +5681,15 @@ electron-fetch@^1.7.2:
     encoding "^0.1.13"
 
 electron-to-chromium@^1.4.601:
+<<<<<<< HEAD
   version "1.4.609"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.609.tgz#5790a70aaa96de232501b56e14b64d17aff93988"
   integrity sha512-ihiCP7PJmjoGNuLpl7TjNA8pCQWu09vGyjlPYw1Rqww4gvNuCcmvl+44G+2QyJ6S2K4o+wbTS++Xz0YN8Q9ERw==
+=======
+  version "1.4.614"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.614.tgz#2fe789d61fa09cb875569f37c309d0c2701f91c0"
+  integrity sha512-X4ze/9Sc3QWs6h92yerwqv7aB/uU8vCjZcrMjA8N9R1pjMFRe44dLsck5FzLilOYvcXuDn93B+bpGYyufc70gQ==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 elliptic@6.5.4, elliptic@^6.5.3, elliptic@^6.5.4:
   version "6.5.4"
@@ -5763,14 +5872,24 @@ eslint-visitor-keys@^3.1.0, eslint-visitor-keys@^3.3.0, eslint-visitor-keys@^3.4
   integrity sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==
 
 eslint@^8.17.0:
+<<<<<<< HEAD
   version "8.55.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.55.0.tgz#078cb7b847d66f2c254ea1794fa395bf8e7e03f8"
   integrity sha512-iyUUAM0PCKj5QpwGfmCAG9XXbZCWsqP/eWAWrG/W0umvjuLRBECwSFdt+rCntju0xEH7teIABPwXpahftIaTdA==
+=======
+  version "8.56.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.56.0.tgz#4957ce8da409dc0809f99ab07a1b94832ab74b15"
+  integrity sha512-Go19xM6T9puCOWntie1/P997aXxFsOi37JIHRWI514Hc6ZnaHGKY9xFhrU65RT6CcBEzZoGG1e6Nq+DT04ZtZQ==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
     "@eslint-community/regexpp" "^4.6.1"
     "@eslint/eslintrc" "^2.1.4"
+<<<<<<< HEAD
     "@eslint/js" "8.55.0"
+=======
+    "@eslint/js" "8.56.0"
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
     "@humanwhocodes/config-array" "^0.11.13"
     "@humanwhocodes/module-importer" "^1.0.1"
     "@nodelib/fs.walk" "^1.2.8"
@@ -8005,9 +8124,15 @@ levn@^0.4.1:
     type-check "~0.4.0"
 
 libphonenumber-js@^1.10.14, libphonenumber-js@^1.9.43:
+<<<<<<< HEAD
   version "1.10.51"
   resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.51.tgz#a3b8c15db2721c3e5f7fe6759e2a524712b578e6"
   integrity sha512-vY2I+rQwrDQzoPds0JeTEpeWzbUJgqoV0O4v31PauHBb/e+1KCXKylHcDnBMgJZ9fH9mErsEbROJY3Z3JtqEmg==
+=======
+  version "1.10.52"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.52.tgz#786d7743e75aba1996824057b60003bb539f8daa"
+  integrity sha512-6vCuCHgem+OW1/VCAKgkasfegItCea8zIT7s9/CG/QxdCMIM7GfzbEBG5d7lGO3rzipjt5woOQL3DiHa8Fy78Q==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 libsodium-wrappers@^0.7.6:
   version "0.7.13"
@@ -9308,9 +9433,9 @@ regenerate@^1.4.2:
   integrity sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==
 
 regenerator-runtime@^0.14.0:
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.14.0.tgz#5e19d68eb12d486f797e15a3c6a918f7cec5eb45"
-  integrity sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.14.1.tgz#356ade10263f685dda125100cd862c1db895327f"
+  integrity sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==
 
 regenerator-transform@^0.15.2:
   version "0.15.2"
@@ -10811,9 +10936,15 @@ ws@^7:
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
 ws@^8.14.2, ws@^8.8.1:
+<<<<<<< HEAD
   version "8.15.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.15.0.tgz#db080a279260c5f532fc668d461b8346efdfcf86"
   integrity sha512-H/Z3H55mrcrgjFwI+5jKavgXvwQLtfPCUEp6pi35VhoB0pfcHnSoyuTzkBEZpzq49g1193CUEwIvmsjcotenYw==
+=======
+  version "8.15.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.15.1.tgz#271ba33a45ca0cc477940f7f200cd7fba7ee1997"
+  integrity sha512-W5OZiCjXEmk0yZ66ZN82beM5Sz7l7coYxpRkzS+p9PP+ToQry8szKh+61eNktr7EA9DOwvFGhfC605jDHbP6QQ==
+>>>>>>> 5a0bb2e (fix: implement transfer in/out mechanism)
 
 xdg-basedir@^4.0.0:
   version "4.0.0"

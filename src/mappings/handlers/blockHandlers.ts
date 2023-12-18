@@ -5,14 +5,11 @@ import { stateSnapshotter } from '../../helpers/stateSnapshot'
 import { SNAPSHOT_INTERVAL_SECONDS } from '../../config'
 import { PoolService } from '../services/poolService'
 import { TrancheService } from '../services/trancheService'
-import { BlockchainService } from '../services/blockchainService'
 
 const timekeeper = TimekeeperService.init()
-const blockchain = BlockchainService.getOrInit()
 
 export const handleBlock = errorHandler(_handleBlock)
 async function _handleBlock(block: SubstrateBlock): Promise<void> {
-  await blockchain
   const blockPeriodStart = getPeriodStart(block.timestamp)
   const blockNumber = block.block.header.number.toNumber()
   const newPeriod = (await timekeeper).processBlock(block)
@@ -64,7 +61,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
     }
 
     //Perform Snapshots and reset accumulators
-    await stateSnapshotter('Pool', 'PoolSnapshot', block, 'poolId')
+    await stateSnapshotter('Pool', 'PoolSnapshot', block, 'poolId', 'isActive', true)
     await stateSnapshotter('Tranche', 'TrancheSnapshot', block, 'trancheId', 'isActive', true)
     await stateSnapshotter('Loan', 'LoanSnapshot', block, 'loanId', 'isActive', true)
 

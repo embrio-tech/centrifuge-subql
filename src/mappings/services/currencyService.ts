@@ -2,29 +2,26 @@ import { Option } from '@polkadot/types'
 import { AssetMetadata } from '@polkadot/types/interfaces'
 import { Currency } from '../../types/models/Currency'
 import { WAD_DIGITS } from '../../config'
-import { TokensCurrencyId } from 'centrifuge-subql/helpers/types'
+import type { TokensCurrencyId } from '../../helpers/types'
 
 export class CurrencyService extends Currency {
+
   static init(chainId: string, currencyId: string, decimals: number) {
-    logger.info(`Initialising new currency ${currencyId} for chain ${chainId} with ${decimals} decimals`)
-    const currency = new this(`${chainId}-${currencyId}`, chainId, decimals)
+    const id = `${chainId}-${currencyId}`
+    logger.info(`Initialising new currency ${id} with ${decimals} decimals`)
+    const currency = new this(id, chainId, decimals)
     return currency
   }
 
   static async getOrInit(chainId: string, currencyType: string, ...currencyValue: string[]) {
     const currencyId = currencyValue.length > 0 ? `${currencyType}-${currencyValue.join('-')}` : currencyType
     const id = `${chainId}-${currencyId}`
-    let currency = await this.get(id)
-    if (currency === undefined) {
+    let currency: CurrencyService = await this.get(id)
+    if(!currency) {
       const assetMetadata = (await api.query.ormlAssetRegistry.metadata({
-        [currencyType]: currencyId ?? null,
+        [currencyType]: currencyValue.length > 0 ? currencyValue[0] : null,
       })) as Option<AssetMetadata>
-      let decimals: number
-      if (assetMetadata.isSome) {
-        decimals = assetMetadata.unwrap().decimals.toNumber()
-      } else {
-        decimals = WAD_DIGITS
-      }
+      const decimals = assetMetadata.isSome ? assetMetadata.unwrap().decimals.toNumber() : WAD_DIGITS
       currency = this.init(chainId, currencyId, decimals)
       await currency.save()
     }

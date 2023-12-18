@@ -7,11 +7,20 @@ import { Pool } from '../../types'
 
 export class PoolService extends Pool {
   static seed(poolId: string) {
+    logger.info(`Seeding pool ${poolId}`)
     return new this(`${poolId}`, 'ALL', false)
   }
 
-  static init(
-    poolId: string,
+  static async getOrSeed(poolId: string) {
+    let pool = await this.getById(poolId)
+    if(!pool) {
+      pool = this.seed(poolId)
+      await pool.save()
+    }
+    return pool
+  }
+
+  public init(
     currencyId: string,
     maxReserve: bigint,
     maxPortfolioValuationAge: number,
@@ -19,43 +28,45 @@ export class PoolService extends Pool {
     timestamp: Date,
     blockNumber: number
   ) {
-    const pool = new this(poolId, 'ALL', true)
+    logger.info(`Initialising pool ${this.id}`)
+    this.isActive = true
+    this.createdAt = timestamp
+    this.createdAtBlockNumber = blockNumber
 
-    pool.createdAt = timestamp
-    pool.createdAtBlockNumber = blockNumber
-    pool.currencyId = currencyId
+    this.minEpochTime = minEpochTime
+    this.maxPortfolioValuationAge = maxPortfolioValuationAge
 
-    pool.minEpochTime = minEpochTime
-    pool.maxPortfolioValuationAge = maxPortfolioValuationAge
+    this.currentEpoch = 1
 
-    pool.currentEpoch = 1
+    this.portfolioValuation = BigInt(0)
+    this.totalReserve = BigInt(0)
+    this.availableReserve = BigInt(0)
+    this.maxReserve = maxReserve
 
-    pool.portfolioValuation = BigInt(0)
-    pool.totalReserve = BigInt(0)
-    pool.availableReserve = BigInt(0)
-    pool.maxReserve = maxReserve
+    this.sumDebt = BigInt(0)
+    this.value = BigInt(0)
 
-    pool.sumDebt = BigInt(0)
-    pool.value = BigInt(0)
+    this.sumNumberOfActiveLoans = BigInt(0)
+    this.sumDebtOverdue = BigInt(0)
+    this.sumDebtWrittenOffByPeriod = BigInt(0)
 
-    pool.sumNumberOfActiveLoans = BigInt(0)
-    pool.sumDebtOverdue = BigInt(0)
-    pool.sumDebtWrittenOffByPeriod = BigInt(0)
+    this.sumBorrowedAmountByPeriod = BigInt(0)
+    this.sumRepaidAmountByPeriod = BigInt(0)
+    this.sumInvestedAmountByPeriod = BigInt(0)
+    this.sumRedeemedAmountByPeriod = BigInt(0)
+    this.sumNumberOfLoansByPeriod = BigInt(0)
 
-    pool.sumBorrowedAmountByPeriod = BigInt(0)
-    pool.sumRepaidAmountByPeriod = BigInt(0)
-    pool.sumInvestedAmountByPeriod = BigInt(0)
-    pool.sumRedeemedAmountByPeriod = BigInt(0)
-    pool.sumNumberOfLoansByPeriod = BigInt(0)
+    this.sumBorrowedAmount = BigInt(0)
+    this.sumRepaidAmount = BigInt(0)
+    this.sumNumberOfLoans = BigInt(0)
 
-    pool.sumBorrowedAmount = BigInt(0)
-    pool.sumRepaidAmount = BigInt(0)
-    pool.sumNumberOfLoans = BigInt(0)
+    this.currencyId = currencyId
 
-    return pool
+    return this
   }
 
   public async initData() {
+    logger.info(`Initialising data for pool: ${this.id}`)
     const [poolReq, metadataReq] = await Promise.all([
       api.query.poolSystem.pool<Option<PoolDetails>>(this.id),
       api.query.poolRegistry.poolMetadata<Option<PoolMetadata>>(this.id),

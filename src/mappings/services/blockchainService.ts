@@ -1,7 +1,6 @@
 import { Blockchain } from '../../types/models/Blockchain'
 
-const thisChainIdPromise = api.rpc.eth.chainId()
-
+const thisChainId = '2030'
 export class BlockchainService extends Blockchain {
   static init(chainId: string) {
     logger.info(`Initialising new blockchain with evm Id ${chainId}`)
@@ -9,15 +8,15 @@ export class BlockchainService extends Blockchain {
   }
 
   static async getOrInit(chainId?: string) {
-    let blockchain = await this.get(chainId ?? await BlockchainService.getThischainId())
+    let blockchain = await this.get(chainId ?? await this.getThisChainId())
     if (!blockchain) {
-      blockchain = this.init(chainId)
+      blockchain = this.init(chainId ?? await this.getThisChainId())
       await blockchain.save()
     }
     return blockchain as BlockchainService
   }
 
-  static async getThischainId() {
-    return (await thisChainIdPromise).toString(10)
+  static async getThisChainId() {
+    return thisChainId
   }
 }

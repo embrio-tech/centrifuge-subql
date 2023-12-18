@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "subql build",
+    "build:dev": "subql build --mode=dev",
     "prepack": "rm -rf dist && subql build",
     "test": "jest",
     "codegen": "subql codegen",

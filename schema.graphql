@@ -365,7 +365,7 @@ type Proxy @entity {
 }
 
 type Currency @entity {
-  id: ID! #TODO: ID format for currencies
+  id: ID! #TODO: chainId - currencyType - [currencySpec]
   chain: Blockchain!
   decimals: Int!
 

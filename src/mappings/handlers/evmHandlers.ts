@@ -18,17 +18,8 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
 
   logger.info(`Adding DynamicSource for pool ${poolId}-${trancheId} token: ${tokenAddress}`)
 
-  let pool = await PoolService.getById(poolId)
-  if (pool === undefined) {
-    pool = PoolService.seed(poolId)
-    await pool.save()
-  }
-
-  let tranche = await TrancheService.getById(poolId, trancheId)
-  if (tranche === undefined) {
-    tranche = TrancheService.seed(poolId, trancheId)
-    await tranche.save()
-  }
+  const pool = await PoolService.getOrSeed(poolId)
+  await TrancheService.getOrSeed(pool.id, trancheId)
 
   await createTrancheTrackerDatasource({ address: tokenAddress })
 }
@@ -41,7 +32,6 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const evmTokenAddress = event.address
   const chainId = event.transaction.chainId
   const blockchain = await BlockchainService.getOrInit(chainId)
-
   const evmToken = await CurrencyService.getOrInit(blockchain.id, evmTokenAddress)
   if (!evmToken) throw new Error('Unregistered EVM Token')
 
