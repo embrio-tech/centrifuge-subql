@@ -13,6 +13,9 @@ export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const [_poolId, _trancheId, tokenAddress] = event.args
 
+  const chainId = parseInt(event.transaction.chainId,16).toString(10)
+  await BlockchainService.getOrInit(chainId)
+
   const poolId = _poolId.toString()
   const trancheId = _trancheId.substring(0, 34)
 
@@ -33,7 +36,6 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const chainId = event.transaction.chainId
   const blockchain = await BlockchainService.getOrInit(chainId)
   const evmToken = await CurrencyService.getOrInit(blockchain.id, evmTokenAddress)
-  if (!evmToken) throw new Error('Unregistered EVM Token')
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
     poolId: evmToken.poolId,

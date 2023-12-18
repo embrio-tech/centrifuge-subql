@@ -1,4 +1,5 @@
 import { Account } from '../../types/models/Account'
+import { BlockchainService } from './blockchainService'
 
 const EVM_SUFFIX = '45564d00'
 const thisChainId = '2030'
@@ -16,10 +17,11 @@ export class AccountService extends Account {
     }
   }
 
-  static async getOrInit(address: string): Promise<AccountService> {
+  static async getOrInit(address: string, blockchainService = BlockchainService): Promise<AccountService> {
     let account = (await this.get(address)) as AccountService
     if (account === undefined) {
       account = await this.init(address)
+      await blockchainService.getOrInit(account.chainId)
       await account.save()
     }
     return account
