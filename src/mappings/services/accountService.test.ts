@@ -1,5 +1,8 @@
 import { AccountService } from './accountService'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+api.query['evmChainId'] = { chainId: jest.fn(() => ({ toString: () => '2030' })) } as any
+
 test('Account is created in database', async () => {
   const id = 'ABCDE'
   const chainId = '2030'
