@@ -1,22 +1,22 @@
 import { Blockchain } from '../../types/models/Blockchain'
-
-const thisChainId = '2030'
+import { u64 } from '@polkadot/types'
 export class BlockchainService extends Blockchain {
   static init(chainId: string) {
     logger.info(`Initialising new blockchain with evm Id ${chainId}`)
     return new this(chainId)
   }
 
-  static async getOrInit(chainId?: string) {
-    let blockchain = await this.get(chainId ?? await this.getThisChainId())
+  static async getOrInit(_chainId?: string) {
+    const chainId = _chainId ?? await this.getThisChainId()
+    let blockchain = await this.get(chainId)
     if (!blockchain) {
-      blockchain = this.init(chainId ?? await this.getThisChainId())
+      blockchain = this.init(chainId)
       await blockchain.save()
     }
     return blockchain as BlockchainService
   }
 
   static async getThisChainId() {
-    return thisChainId
+    return ((await api.query.evmChainId.chainId()) as u64).toString(10)
   }
 }

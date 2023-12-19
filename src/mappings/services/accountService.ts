@@ -2,10 +2,9 @@ import { Account } from '../../types/models/Account'
 import { BlockchainService } from './blockchainService'
 
 const EVM_SUFFIX = '45564d00'
-const thisChainId = '2030'
 
 export class AccountService extends Account {
-  static async init(address: string) {
+  static async init(address: string, blockchainService = BlockchainService) {
     logger.info(`Initialising new account: ${address}`)
     if (this.isEvm(address)) {
       const chainId = this.readEvmChainId(address)
@@ -13,7 +12,7 @@ export class AccountService extends Account {
       account.evmAddress = address.substring(0, 42)
       return account
     } else {
-      return new this(address, thisChainId)
+      return new this(address, await blockchainService.getThisChainId())
     }
   }
 
