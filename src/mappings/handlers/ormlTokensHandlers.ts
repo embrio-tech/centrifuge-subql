@@ -16,8 +16,10 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
   // Skip token transfers from and to excluded addresses
   const fromAddress = String.fromCharCode(...from.toU8a())
   const toAddress = String.fromCharCode(...to.toU8a())
-  const isFromExcludedAddress = fromAddress.startsWith('pool')
-  const isToExcludedAddress = toAddress.startsWith('pool')
+  const isFromExcludedAddress =
+    fromAddress.startsWith('pool') || fromAddress.startsWith('invs') || fromAddress.startsWith('domn')
+  const isToExcludedAddress =
+    toAddress.startsWith('pool') || toAddress.startsWith('invs') || toAddress.startsWith('domn')
 
   const [fromAccount, toAccount] = await Promise.all([
     AccountService.getOrInit(from.toHex()),
@@ -75,14 +77,14 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
       `at block ${event.block.block.header.number.toString()}`
   )
 
-  if (!fromAddress.startsWith('pool')) {
+  if (!isFromExcludedAddress) {
     const fromAccount = await AccountService.getOrInit(from.toHex())
     const fromCurrencyBalance = await CurrencyBalanceService.getOrInit(fromAccount.id, currency.id)
     await fromCurrencyBalance.debit(amount.toBigInt())
     await fromCurrencyBalance.save()
   }
 
-  if (!toAddress.startsWith('pool')) {
+  if (!isToExcludedAddress) {
     const toAccount = await AccountService.getOrInit(to.toHex())
     const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
     await toCurrencyBalance.credit(amount.toBigInt())
