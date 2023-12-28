@@ -8,6 +8,7 @@ import { TrancheService } from '../services/trancheService'
 import { InvestorTransactionData, InvestorTransactionService } from '../services/investorTransactionService'
 import { CurrencyService } from '../services/currencyService'
 import { BlockchainService } from '../services/blockchainService'
+import { CurrencyBalanceService } from '../services/currencyBalanceService'
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
@@ -35,7 +36,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const evmTokenAddress = event.address
   const chainId = event.transaction.chainId
   const blockchain = await BlockchainService.getOrInit(chainId)
-  const evmToken = await CurrencyService.getOrInit(blockchain.id, evmTokenAddress)
+  const evmToken = await CurrencyService.getOrInitEvm(blockchain.id, evmTokenAddress)
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
     poolId: evmToken.poolId,
@@ -50,8 +51,13 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   if (fromEvmAddress.toString() !== evmTokenAddress) {
     const fromAddress = AccountService.evmToSubstrate(fromEvmAddress.toString(), blockchain.id)
     const fromAccount = await AccountService.getOrInit(fromAddress)
+
     const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
     await txOut.save()
+
+    const fromBalance = await CurrencyBalanceService.getOrInitEvm(fromAddress, evmToken.id)
+    await fromBalance.debit(amount.toBigInt())
+    await fromBalance.save()
   }
 
   if (toEvmAddress.toString() !== evmTokenAddress) {
@@ -59,5 +65,9 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
     await txIn.save()
+
+    const toBalance = await CurrencyBalanceService.getOrInitEvm(toAddress, blockchain.id)
+    await toBalance.credit(amount.toBigInt())
+    await toBalance.save()
   }
 }
