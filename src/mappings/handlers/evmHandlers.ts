@@ -20,7 +20,7 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const poolId = _poolId.toString()
   const trancheId = _trancheId.substring(0, 34)
 
-  logger.info(`Adding DynamicSource for pool ${poolId}-${trancheId} token: ${tokenAddress}`)
+  logger.info(`Adding DynamicSource for pool ${poolId}-${trancheId} token: ${tokenAddress} block: ${event.blockNumber}`)
 
   const pool = await PoolService.getOrSeed(poolId)
   await TrancheService.getOrSeed(pool.id, trancheId)
@@ -31,10 +31,10 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
 export const handleEvmTransfer = errorHandler(_handleEvmTransfer)
 async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const [fromEvmAddress, toEvmAddress, amount] = event.args
-  logger.info(`Transfer ${fromEvmAddress.toString()}-${toEvmAddress.toString()} of ${amount.toString()}`)
+  logger.info(`Transfer ${fromEvmAddress}-${toEvmAddress} of ${amount.toString()} at block: ${event.blockNumber}`)
 
   const evmTokenAddress = event.address
-  const chainId = event.transaction.chainId
+  const chainId =  parseInt(event.transaction.chainId,16).toString(10)
   const blockchain = await BlockchainService.getOrInit(chainId)
   const evmToken = await CurrencyService.getOrInitEvm(blockchain.id, evmTokenAddress)
 
@@ -48,8 +48,8 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     amount: amount.toBigInt(),
   }
 
-  if (fromEvmAddress.toString() !== evmTokenAddress) {
-    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress.toString(), blockchain.id)
+  if (fromEvmAddress !== evmTokenAddress) {
+    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
     const fromAccount = await AccountService.getOrInit(fromAddress)
 
     const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
@@ -60,8 +60,8 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     await fromBalance.save()
   }
 
-  if (toEvmAddress.toString() !== evmTokenAddress) {
-    const toAddress = AccountService.evmToSubstrate(toEvmAddress.toString(), blockchain.id)
+  if (toEvmAddress !== evmTokenAddress) {
+    const toAddress = AccountService.evmToSubstrate(toEvmAddress, blockchain.id)
     const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
     await txIn.save()
