@@ -21,7 +21,9 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const poolId = _poolId.toString()
   const trancheId = _trancheId.substring(0, 34)
 
-  logger.info(`Adding DynamicSource for pool ${poolId}-${trancheId} token: ${tokenAddress} block: ${event.blockNumber}`)
+  logger.info(
+    `Adding DynamicSource for tranche ${poolId}-${trancheId} token: ${tokenAddress} block: ${event.blockNumber}`
+  )
 
   const pool = await PoolService.getOrSeed(poolId)
   const tranche = await TrancheService.getOrSeed(pool.id, trancheId)
@@ -35,6 +37,8 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
 
   await createTrancheTrackerDatasource({ address: tokenAddress })
 }
+
+const nullAddress = '0x0000000000000000000000000000000000000000'
 
 export const handleEvmTransfer = errorHandler(_handleEvmTransfer)
 async function _handleEvmTransfer(event: TransferLog): Promise<void> {
@@ -57,7 +61,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     amount: amount.toBigInt(),
   }
 
-  if (fromEvmAddress !== evmTokenAddress && fromEvmAddress !== escrowAddress) {
+  if (fromEvmAddress !== evmTokenAddress && fromEvmAddress !== escrowAddress && fromEvmAddress !== nullAddress) {
     const fromAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
     const fromAccount = await AccountService.getOrInit(fromAddress)
 
@@ -69,7 +73,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     await fromBalance.save()
   }
 
-  if (toEvmAddress !== evmTokenAddress && toEvmAddress !== escrowAddress) {
+  if (toEvmAddress !== evmTokenAddress && toEvmAddress !== escrowAddress && toEvmAddress !== nullAddress) {
     const toAddress = AccountService.evmToSubstrate(toEvmAddress, blockchain.id)
     const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
