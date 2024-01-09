@@ -37,7 +37,7 @@ export class InvestorTransactionService extends InvestorTransaction {
       `${data.hash}-${data.epochNumber.toString()}-${type.toString()}`,
       data.hash,
       data.address,
-      data.poolId.toString(),
+      data.poolId,
       `${data.poolId}-${data.trancheId}`,
       data.timestamp,
       type

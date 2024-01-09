@@ -9,13 +9,14 @@ import { InvestorTransactionData, InvestorTransactionService } from '../services
 import { CurrencyService } from '../services/currencyService'
 import { BlockchainService } from '../services/blockchainService'
 import { CurrencyBalanceService } from '../services/currencyBalanceService'
+import { PoolManagerAbi__factory } from '../../types/contracts'
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const [_poolId, _trancheId, tokenAddress] = event.args
 
-  const chainId = parseInt(event.transaction.chainId,16).toString(10)
-  await BlockchainService.getOrInit(chainId)
+  const chainId = parseInt(event.transaction.chainId, 16).toString(10)
+  const blockchain = await BlockchainService.getOrInit(chainId)
 
   const poolId = _poolId.toString()
   const trancheId = _trancheId.substring(0, 34)
@@ -23,7 +24,14 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   logger.info(`Adding DynamicSource for pool ${poolId}-${trancheId} token: ${tokenAddress} block: ${event.blockNumber}`)
 
   const pool = await PoolService.getOrSeed(poolId)
-  await TrancheService.getOrSeed(pool.id, trancheId)
+  const tranche = await TrancheService.getOrSeed(pool.id, trancheId)
+
+  const currency = await CurrencyService.getOrInitEvm(blockchain.id, tokenAddress)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const poolManager = PoolManagerAbi__factory.connect(event.address, api as any)
+  const escrowAddress = await poolManager.escrow()
+  await currency.initEvmDetails(tokenAddress, escrowAddress, tranche.poolId, tranche.trancheId)
+  await currency.save()
 
   await createTrancheTrackerDatasource({ address: tokenAddress })
 }
@@ -34,9 +42,10 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   logger.info(`Transfer ${fromEvmAddress}-${toEvmAddress} of ${amount.toString()} at block: ${event.blockNumber}`)
 
   const evmTokenAddress = event.address
-  const chainId =  parseInt(event.transaction.chainId,16).toString(10)
+  const chainId = parseInt(event.transaction.chainId, 16).toString(10)
   const blockchain = await BlockchainService.getOrInit(chainId)
   const evmToken = await CurrencyService.getOrInitEvm(blockchain.id, evmTokenAddress)
+  const escrowAddress = evmToken.escrowAddress
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
     poolId: evmToken.poolId,
@@ -48,7 +57,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     amount: amount.toBigInt(),
   }
 
-  if (fromEvmAddress !== evmTokenAddress) {
+  if (fromEvmAddress !== evmTokenAddress && fromEvmAddress !== escrowAddress) {
     const fromAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
     const fromAccount = await AccountService.getOrInit(fromAddress)
 
@@ -60,7 +69,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     await fromBalance.save()
   }
 
-  if (toEvmAddress !== evmTokenAddress) {
+  if (toEvmAddress !== evmTokenAddress && toEvmAddress !== escrowAddress) {
     const toAddress = AccountService.evmToSubstrate(toEvmAddress, blockchain.id)
     const toAccount = await AccountService.getOrInit(toAddress)
     const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
