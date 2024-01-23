@@ -9,7 +9,7 @@ import { InvestorTransactionData, InvestorTransactionService } from '../services
 import { CurrencyService } from '../services/currencyService'
 import { BlockchainService } from '../services/blockchainService'
 import { CurrencyBalanceService } from '../services/currencyBalanceService'
-import { PoolManagerAbi__factory } from '../../types/contracts'
+import { InvestmentManagerAbi__factory, PoolManagerAbi__factory } from '../../types/contracts'
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
@@ -32,7 +32,13 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const poolManager = PoolManagerAbi__factory.connect(event.address, api as any)
   const escrowAddress = await poolManager.escrow()
-  await currency.initEvmDetails(tokenAddress, escrowAddress, tranche.poolId, tranche.trancheId)
+
+  const investmentManagerAddress = await poolManager.investmentManager()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const investmentManager = InvestmentManagerAbi__factory.connect(investmentManagerAddress, api as any)
+  const userEscrowAddress = await investmentManager.userEscrow()
+
+  await currency.initEvmDetails(tokenAddress, escrowAddress, userEscrowAddress,tranche.poolId, tranche.trancheId)
   await currency.save()
 
   await createTrancheTrackerDatasource({ address: tokenAddress })

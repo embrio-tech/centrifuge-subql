@@ -372,6 +372,7 @@ type Currency @entity {
 
   tokenAddress: String
   escrowAddress: String
+  userEscrowAddress: String
 
   pool: Pool
   tranche: Tranche
