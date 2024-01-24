@@ -107,6 +107,14 @@ export class InvestorTransactionService extends InvestorTransaction {
     return this.init(data, InvestorTransactionType.REDEEM_COLLECT)
   }
 
+  static collectLpInvestOrder(data: InvestorTransactionData) {
+    return this.init(data, InvestorTransactionType.INVEST_LP_COLLECT)
+  }
+
+  static collectLpRedeemOrder(data: InvestorTransactionData) {
+    return this.init(data, InvestorTransactionType.REDEEM_LP_COLLECT)
+  }
+
   static transferIn(data: InvestorTransactionData) {
     logger.info(
       `Transfer In for address ${data.address} in pool ${data.poolId} tranche ${data.trancheId} ` +

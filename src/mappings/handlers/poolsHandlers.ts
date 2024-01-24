@@ -56,6 +56,7 @@ async function _handlePoolCreated(event: SubstrateEvent<PoolCreatedEvent>): Prom
 
   // Initialise Epoch
   const trancheIds = tranches.map((tranche) => tranche.trancheId)
+  logger.info(JSON.stringify(trancheIds))
   const epoch = await EpochService.init(poolId.toString(), pool.currentEpoch, trancheIds, event.block.timestamp)
   await epoch.saveWithStates()
 }

@@ -38,7 +38,7 @@ async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const investmentManager = InvestmentManagerAbi__factory.connect(investmentManagerAddress, api as any)
   const userEscrowAddress = await investmentManager.userEscrow()
 
-  await currency.initEvmDetails(tokenAddress, escrowAddress, userEscrowAddress,tranche.poolId, tranche.trancheId)
+  await currency.initEvmDetails(tokenAddress, escrowAddress, userEscrowAddress, tranche.poolId, tranche.trancheId)
   await currency.save()
 
   await createTrancheTrackerDatasource({ address: tokenAddress })
@@ -55,7 +55,13 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   const chainId = parseInt(event.transaction.chainId, 16).toString(10)
   const blockchain = await BlockchainService.getOrInit(chainId)
   const evmToken = await CurrencyService.getOrInitEvm(blockchain.id, evmTokenAddress)
-  const escrowAddress = evmToken.escrowAddress
+  const { escrowAddress, userEscrowAddress } = evmToken
+  const serviceAddresses = [evmTokenAddress, escrowAddress, userEscrowAddress, nullAddress]
+
+  const isFromUserAddress = !serviceAddresses.includes(fromEvmAddress)
+  const isToUserAddress = !serviceAddresses.includes(toEvmAddress)
+  const isFromEscrow = fromEvmAddress === escrowAddress
+  const _isFromUserEscrow = fromEvmAddress === userEscrowAddress
 
   const orderData: Omit<InvestorTransactionData, 'address'> = {
     poolId: evmToken.poolId,
@@ -67,26 +73,46 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
     amount: amount.toBigInt(),
   }
 
-  if (fromEvmAddress !== evmTokenAddress && fromEvmAddress !== escrowAddress && fromEvmAddress !== nullAddress) {
-    const fromAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
-    const fromAccount = await AccountService.getOrInit(fromAddress)
+  let fromAddress: string, fromAccount: AccountService
+  if (isFromUserAddress) {
+    fromAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
+    fromAccount = await AccountService.getOrInit(fromAddress)
+  }
 
-    const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
-    await txOut.save()
+  let toAddress: string, toAccount: AccountService
+  if (isToUserAddress) {
+    toAddress = AccountService.evmToSubstrate(fromEvmAddress, blockchain.id)
+    toAccount = await AccountService.getOrInit(fromAddress)
+  }
 
+  // Handle Currency Balance Updates
+  if (isToUserAddress) {
+    const toBalance = await CurrencyBalanceService.getOrInitEvm(toAddress, blockchain.id)
+    await toBalance.credit(amount.toBigInt())
+  }
+
+  if (isFromUserAddress) {
     const fromBalance = await CurrencyBalanceService.getOrInitEvm(fromAddress, evmToken.id)
     await fromBalance.debit(amount.toBigInt())
     await fromBalance.save()
   }
 
-  if (toEvmAddress !== evmTokenAddress && toEvmAddress !== escrowAddress && toEvmAddress !== nullAddress) {
-    const toAddress = AccountService.evmToSubstrate(toEvmAddress, blockchain.id)
-    const toAccount = await AccountService.getOrInit(toAddress)
+  // Handle INVEST_LP_COLLECT
+  if (isFromEscrow && isToUserAddress) {
+    const investLpCollect = InvestorTransactionService.collectLpInvestOrder({ ...orderData, address: toAccount.id })
+    await investLpCollect.save()
+  }
+  // TODO: Handle REDEEM_LP_COLLECT
+  // if (isFromUserEscrow && isToUserAddress) {
+  //   const redeemLpCollect = InvestorTransactionService.collectLpRedeemOrder()
+  // }
+
+  // Handle Transfer In and Out
+  if (isFromUserAddress && isToUserAddress) {
     const txIn = InvestorTransactionService.transferIn({ ...orderData, address: toAccount.id })
     await txIn.save()
 
-    const toBalance = await CurrencyBalanceService.getOrInitEvm(toAddress, blockchain.id)
-    await toBalance.credit(amount.toBigInt())
-    await toBalance.save()
+    const txOut = InvestorTransactionService.transferOut({ ...orderData, address: fromAccount.id })
+    await txOut.save()
   }
 }
