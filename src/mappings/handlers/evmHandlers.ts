@@ -11,6 +11,7 @@ import { BlockchainService } from '../services/blockchainService'
 import { CurrencyBalanceService } from '../services/currencyBalanceService'
 import { InvestmentManagerAbi__factory, PoolManagerAbi__factory } from '../../types/contracts'
 import type { Provider } from '@ethersproject/abstract-provider'
+import { TrancheBalanceService } from '../services/trancheBalanceService'
 
 const ethApi = api as unknown as Provider
 const networkPromise = typeof ethApi.getNetwork === 'function' ? ethApi.getNetwork() : null
@@ -105,6 +106,10 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   if (isFromEscrow && isToUserAddress) {
     const investLpCollect = InvestorTransactionService.collectLpInvestOrder({ ...orderData, address: toAccount.id })
     await investLpCollect.save()
+
+    const trancheBalance = await TrancheBalanceService.getOrInit(toAccount.id, orderData.poolId, orderData.trancheId)
+    await trancheBalance.investCollect(orderData.amount)
+    await trancheBalance.save()
   }
   // TODO: Handle REDEEM_LP_COLLECT
   // if (isFromUserEscrow && isToUserAddress) {
