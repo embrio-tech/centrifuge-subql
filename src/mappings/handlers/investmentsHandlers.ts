@@ -139,10 +139,11 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
       `Address: ${address.toHex()} at ` +
       `block ${event.block.block.header.number.toString()} hash:${event.extrinsic.extrinsic.hash.toString()}`
   )
-
+  const nodeChainId = await getNodeChainId()
   const account = await AccountService.getOrInit(address.toHex())
-  if (account.isLiquidityPoolInvestor()) {
-    logger.info('Skipping as Address is EVM')
+  const isForeignEvmInvestor = account.chainId !== nodeChainId
+  if (account.isLiquidityPoolInvestor() && isForeignEvmInvestor) {
+    logger.info('Skipping Address as collection is from another EVM Chain')
     return
   }
 
