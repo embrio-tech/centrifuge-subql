@@ -190,12 +190,16 @@ async function _handleRedeemOrdersCollected(event: SubstrateEvent<RedeemOrdersCo
       `block ${event.block.block.header.number.toString()} hash:${event.extrinsic.extrinsic.hash.toString()}`
   )
 
+  const account = await AccountService.getOrInit(address.toHex())
+  if (account.isEvm()) {
+    logger.info('Skipping as Address is EVM')
+    return
+  }
+
   const pool = await PoolService.getById(poolId.toString())
   if (pool === undefined) throw missingPool
   const endEpochId = pool.lastEpochClosed
   logger.info(`Collection for ending epoch: ${endEpochId}`)
-
-  const account = await AccountService.getOrInit(address.toHex())
 
   const tranche = await TrancheService.getById(poolId.toString(), trancheId.toHex())
 
