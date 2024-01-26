@@ -14,13 +14,13 @@ import type { Provider } from '@ethersproject/abstract-provider'
 import { TrancheBalanceService } from '../services/trancheBalanceService'
 
 const ethApi = api as unknown as Provider
-const networkPromise = typeof ethApi.getNetwork === 'function' ? ethApi.getNetwork() : null
+//const networkPromise = typeof ethApi.getNetwork === 'function' ? ethApi.getNetwork() : null
 
 export const handleEvmDeployTranche = errorHandler(_handleEvmDeployTranche)
 async function _handleEvmDeployTranche(event: DeployTrancheLog): Promise<void> {
   const [_poolId, _trancheId, tokenAddress] = event.args
 
-  const chainId = (await networkPromise).chainId.toString(10)
+  const chainId = await getNodeChainId() //(await networkPromise).chainId.toString(10)
   const blockchain = await BlockchainService.getOrInit(chainId)
 
   const poolId = _poolId.toString()
@@ -55,7 +55,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   logger.info(`Transfer ${fromEvmAddress}-${toEvmAddress} of ${amount.toString()} at block: ${event.blockNumber}`)
 
   const evmTokenAddress = event.address
-  const chainId = (await networkPromise).chainId.toString(10)
+  const chainId = await getNodeChainId() //(await networkPromise).chainId.toString(10)
   const blockchain = await BlockchainService.getOrInit(chainId)
   const evmToken = await CurrencyService.getOrInitEvm(blockchain.id, evmTokenAddress)
   const { escrowAddress, userEscrowAddress } = evmToken

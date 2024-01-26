@@ -141,7 +141,7 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
   )
 
   const account = await AccountService.getOrInit(address.toHex())
-  if (account.isEvm()) {
+  if (account.isLiquidityPoolInvestor()) {
     logger.info('Skipping as Address is EVM')
     return
   }
@@ -191,7 +191,7 @@ async function _handleRedeemOrdersCollected(event: SubstrateEvent<RedeemOrdersCo
   )
 
   const account = await AccountService.getOrInit(address.toHex())
-  if (account.isEvm()) {
+  if (account.isLiquidityPoolInvestor()) {
     logger.info('Skipping as Address is EVM')
     return
   }
