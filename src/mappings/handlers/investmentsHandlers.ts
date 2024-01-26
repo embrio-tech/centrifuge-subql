@@ -168,7 +168,7 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
 
   const trancheBalance = await TrancheBalanceService.getOrInit(orderData.address, orderData.poolId, orderData.trancheId)
 
-  if (orderData.amount > 0) {
+  if (orderData.amount > 0 && !account.isEvm()) {
     const it = InvestorTransactionService.collectInvestOrder(orderData)
     await it.save()
 

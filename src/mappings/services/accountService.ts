@@ -18,7 +18,7 @@ export class AccountService extends Account {
 
   static async getOrInit(address: string, blockchainService = BlockchainService): Promise<AccountService> {
     let account = (await this.get(address)) as AccountService
-    if (account === undefined) {
+    if (!account) {
       account = await this.init(address)
       await blockchainService.getOrInit(account.chainId)
       await account.save()

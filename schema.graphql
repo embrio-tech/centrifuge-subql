@@ -212,7 +212,7 @@ type OutstandingOrder @entity {
 }
 
 type InvestorTransaction @entity {
-  id: ID! # extrinsic hash - epoch number - transaction type
+  id: ID! # extrinsic hash - epoch number ( or 0 for EVM ) - transaction type
   hash: String!
   account: Account! @index #Account @index
   pool: Pool! @index

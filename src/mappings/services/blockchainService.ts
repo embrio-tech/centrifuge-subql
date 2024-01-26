@@ -7,7 +7,7 @@ export class BlockchainService extends Blockchain {
   }
 
   static async getOrInit(_chainId?: string) {
-    const chainId = _chainId ?? await this.getThisChainId()
+    const chainId = _chainId ?? (await this.getThisChainId())
     let blockchain = await this.get(chainId)
     if (!blockchain) {
       blockchain = this.init(chainId)
