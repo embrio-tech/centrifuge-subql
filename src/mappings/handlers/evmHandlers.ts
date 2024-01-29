@@ -94,6 +94,7 @@ async function _handleEvmTransfer(event: TransferLog): Promise<void> {
   if (isToUserAddress) {
     const toBalance = await CurrencyBalanceService.getOrInitEvm(toAddress, evmToken.id)
     await toBalance.credit(amount.toBigInt())
+    await toBalance.save()
   }
 
   if (isFromUserAddress) {

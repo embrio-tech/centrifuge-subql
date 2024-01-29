@@ -8,7 +8,7 @@ const ethNetworkProm =
   typeof (api as unknown as Provider).getNetwork === 'function' ? (api as unknown as Provider).getNetwork() : null
 
 global.atob = atob
-global.geNodetChainId = async function () {
+global.getNodeChainId = async function () {
   if(cfgChainIdProm) return (await cfgChainIdProm).toString(10)
   if(ethNetworkProm) return (await ethNetworkProm).chainId.toString(10)
 }
