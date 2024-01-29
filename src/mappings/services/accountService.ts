@@ -6,7 +6,7 @@ const EVM_SUFFIX = '45564d00'
 export class AccountService extends Account {
   static async init(address: string) {
     logger.info(`Initialising new account: ${address}`)
-    if (this.isLiquidityPoolInvestor(address)) {
+    if (this.isEvm(address)) {
       const chainId = this.readEvmChainId(address)
       const account = new this(address, chainId)
       account.evmAddress = address.substring(0, 42)
@@ -35,11 +35,16 @@ export class AccountService extends Account {
     return parseInt(address.slice(-12, -8), 16).toString(10)
   }
 
-  static isLiquidityPoolInvestor(address: string) {
+  static isEvm(address: string) {
     return address.length === 66 && address.endsWith(EVM_SUFFIX)
   }
 
-  public isLiquidityPoolInvestor() {
-    return AccountService.isLiquidityPoolInvestor(this.id)
+  public async isForeignEvm() {
+    const nodeChainId = await getNodeChainId()
+    return this.chainId !== nodeChainId
+  }
+
+  public isEvm() {
+    return AccountService.isEvm(this.id)
   }
 }

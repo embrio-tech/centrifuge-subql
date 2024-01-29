@@ -139,16 +139,14 @@ async function _handleInvestOrdersCollected(event: SubstrateEvent<InvestOrdersCo
       `Address: ${address.toHex()} at ` +
       `block ${event.block.block.header.number.toString()} hash:${event.extrinsic.extrinsic.hash.toString()}`
   )
-  const nodeChainId = await getNodeChainId()
   const account = await AccountService.getOrInit(address.toHex())
-  const isForeignEvmInvestor = account.chainId !== nodeChainId
-  if (account.isLiquidityPoolInvestor() && isForeignEvmInvestor) {
+  if (await account.isForeignEvm()) {
     logger.info('Skipping Address as collection is from another EVM Chain')
     return
   }
 
   const pool = await PoolService.getById(poolId.toString())
-  if (pool === undefined) throw missingPool
+  if (!pool) throw missingPool
   const endEpochId = pool.lastEpochClosed
   logger.info(`Collection for ending epoch: ${endEpochId}`)
 
@@ -192,7 +190,7 @@ async function _handleRedeemOrdersCollected(event: SubstrateEvent<RedeemOrdersCo
   )
 
   const account = await AccountService.getOrInit(address.toHex())
-  if (account.isLiquidityPoolInvestor()) {
+  if (await account.isForeignEvm()) {
     logger.info('Skipping as Address is EVM')
     return
   }
