@@ -21,7 +21,8 @@ dataSources:
         - handler: handleBlock
           kind: substrate/BlockHandler
           filter:
-            timestamp: '1 0,12 * * *'
+            modulo: 300
+            #timestamp: '1 0,12 * * *'
         # - handler: logEvents
         #   kind: substrate/EventHandler
         - handler: handlePoolCreated
