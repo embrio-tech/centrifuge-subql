@@ -46,6 +46,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       }
 
       const activeLoanData = await pool.getActiveLoanData()
+      await pool.getPortfolio()
       //  TODO: Reinclude outstanding debt calculation
       //   for (const loanId in activeLoanData) {
       //     const loan = await LoanService.getById(pool.id, loanId)

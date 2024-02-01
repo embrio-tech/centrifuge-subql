@@ -2,7 +2,15 @@ import { Option, u64, u128, Vec } from '@polkadot/types'
 import { ITuple } from '@polkadot/types/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
 import { paginatedGetter } from '../../helpers/paginatedGetter'
-import { ExtendedRpc, LoanInfoActive, NavDetails, PoolDetails, PoolMetadata, TrancheDetails } from '../../helpers/types'
+import {
+  ExtendedCall,
+  ExtendedRpc,
+  LoanInfoActive,
+  NavDetails,
+  PoolDetails,
+  PoolMetadata,
+  TrancheDetails,
+} from '../../helpers/types'
 import { Pool } from '../../types'
 
 export class PoolService extends Pool {
@@ -13,9 +21,9 @@ export class PoolService extends Pool {
 
   static async getOrSeed(poolId: string, saveSeed = true) {
     let pool = await this.getById(poolId)
-    if(!pool) {
+    if (!pool) {
       pool = this.seed(poolId)
-      if(saveSeed) await pool.save()
+      if (saveSeed) await pool.save()
     }
     return pool
   }
@@ -212,6 +220,12 @@ export class PoolService extends Pool {
       tokenPrices = undefined
     }
     return tokenPrices
+  }
+
+  public async getPortfolio() {
+    const apiCall = api.call as ExtendedCall
+    const portfolioData = await apiCall.loansApi.portfolio(this.id)
+    logger.info(JSON.stringify(portfolioData.toJSON()))
   }
 }
 
