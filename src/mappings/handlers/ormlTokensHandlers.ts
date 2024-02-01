@@ -99,16 +99,16 @@ async function _handleTokenEndowed(event: SubstrateEvent<TokensEndowedDepositedW
     `Currency endowment in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const blockchain = await BlockchainService.getOrInit()
-  const currency = await CurrencyService.getOrInit(
-    blockchain.id,
-    _currency.type,
-    ...currencyFormatters[_currency.type](_currency.value)
-  )
-  const toAccount = await AccountService.getOrInit(address.toHex())
-  const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
-  await toCurrencyBalance.credit(amount.toBigInt())
-  await toCurrencyBalance.save()
+  // const blockchain = await BlockchainService.getOrInit()
+  // const currency = await CurrencyService.getOrInit(
+  //   blockchain.id,
+  //   _currency.type,
+  //   ...currencyFormatters[_currency.type](_currency.value)
+  // )
+  // const toAccount = await AccountService.getOrInit(address.toHex())
+  // const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
+  // await toCurrencyBalance.credit(amount.toBigInt())
+  // await toCurrencyBalance.save()
 }
 
 export const handleTokenDeposited = errorHandler(_handleTokenDeposited)
