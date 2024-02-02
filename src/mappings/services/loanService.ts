@@ -1,10 +1,9 @@
-import { Option, Vec } from '@polkadot/types'
+import { Option } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
-import { RAY, WAD } from '../../config'
-import { InterestAccrualRateDetails, NftItemMetadata } from '../../helpers/types'
+import { WAD } from '../../config'
+import { NftItemMetadata } from '../../helpers/types'
 import { Loan, LoanStatus } from '../../types'
-
-const SECONDS_PER_YEAR = bnToBn('3600').muln(24).muln(365)
+import { ActiveLoanData } from './poolService'
 
 export class LoanService extends Loan {
   static init(poolId: string, loanId: string, nftClassId: bigint, nftItemId: bigint, timestamp: Date) {
@@ -62,14 +61,8 @@ export class LoanService extends Loan {
     this.status = LoanStatus.CLOSED
   }
 
-  public async updateOutstandingDebt(normalizedAcc: bigint, interestRate: bigint) {
-    const interestRatePerSec = nToBigInt(bnToBn(interestRate).div(SECONDS_PER_YEAR).add(RAY))
-    logger.info(`Calculated IRS: ${interestRatePerSec.toString()}`)
-    const rateDetails = await api.query.interestAccrual.rates<Vec<InterestAccrualRateDetails>>()
-    const { accumulatedRate } = rateDetails.find(
-      (rateDetails) => rateDetails.interestRatePerSec.toBigInt() === interestRatePerSec
-    )
-    this.outstandingDebt = nToBigInt(bnToBn(normalizedAcc).mul(bnToBn(accumulatedRate)).div(RAY))
+  public async updateActiveLoanData(activeLoanData: ActiveLoanData[keyof ActiveLoanData]) {
+    Object.assign(this, activeLoanData)
     logger.info(`Updating outstanding debt for loan: ${this.id} to ${this.outstandingDebt.toString()}`)
   }
 

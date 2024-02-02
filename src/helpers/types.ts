@@ -1,7 +1,7 @@
 //find out types: const a = createType(api.registry, '[u8;32]', 18)
 import { AugmentedCall, AugmentedRpc, PromiseRpcResult } from '@polkadot/api/types'
 import { Enum, Null, Struct, u128, u32, u64, U8aFixed, Option, Vec, Bytes } from '@polkadot/types'
-import { AccountId32, Perquintill } from '@polkadot/types/interfaces'
+import { AccountId32, Perquintill, Balance } from '@polkadot/types/interfaces'
 import { ITuple, Observable } from '@polkadot/types/types'
 
 export interface PoolDetails extends Struct {
@@ -160,6 +160,13 @@ export interface LoanInfoCreated extends Struct {
     borrows: Enum
     repayments: Enum
   }
+}
+
+export interface LoanInfoActivePortfolio extends Struct {
+  activeLoan: LoanInfoActive,
+  presentValue: Balance,
+  outstandingPrincipal: Balance,
+  outstandingInterest: Balance,
 }
 
 export interface LoanInfoActive extends Struct {
@@ -367,6 +374,6 @@ export type ExtendedRpc = typeof api.rpc & {
 
 export type ExtendedCall = typeof api.call & {
   loansApi: {
-    portfolio: AugmentedCall<'promise', (poolId: string) => Observable<Vec<ITuple<[u64, LoanInfoActive]>>>>
+    portfolio: AugmentedCall<'promise', (poolId: string) => Observable<Vec<ITuple<[u64, LoanInfoActivePortfolio]>>>>
   }
 }

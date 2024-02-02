@@ -3,6 +3,19 @@ import type { OverrideBundleDefinition } from '@polkadot/types/types'
 /* eslint-disable sort-keys */
 
 const definitions: OverrideBundleDefinition = {
+  types: [
+    {
+      minmax: [undefined, undefined],
+      types: {
+        ActiveLoanInfo: {
+          activeLoan: 'PalletLoansEntitiesLoansActiveLoan',
+          presentValue: 'Balance',
+          outstandingPrincipal: 'Balance',
+          outstandingInterest: 'Balance',
+        },
+      },
+    },
+  ],
   runtime: {
     LoansApi: [
       {
