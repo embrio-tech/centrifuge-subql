@@ -349,10 +349,19 @@ type LoanSnapshot @entity {
   blockNumber: Int!
   periodStart: Date! @index
 
-  outstandingDebt: BigInt
   outstandingPrincipal: BigInt
   outstandingInterest: BigInt
+  outstandingDebt: BigInt
   presentValue: BigInt
+  actualMaturityDate: Date
+  timeToMaturity: Int
+  actualOriginationDate: Date
+  writeOffPercentage: BigInt
+  totalBorrowed: BigInt
+  totalRepaid: BigInt
+  totalRepaidPrincipal: BigInt
+  totalRepaidInterest: BigInt
+  totalRepaidUnscheduled: BigInt
 
   borrowedAmountByPeriod: BigInt
   repaidAmountByPeriod: BigInt
