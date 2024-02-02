@@ -53,6 +53,7 @@ export class LoanService extends Loan {
   }
 
   public updateLoanSpecs(decodedLoanSpecs: LoanSpecs) {
+    logger.info(`Updating loan specs for ${this.id}`)
     Object.assign(this, decodedLoanSpecs)
   }
 
