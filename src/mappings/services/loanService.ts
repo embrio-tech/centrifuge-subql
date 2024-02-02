@@ -10,16 +10,16 @@ export class LoanService extends Loan {
     logger.info(`Initialising loan ${loanId} for pool ${poolId}`)
     const loan = new this(`${poolId}-${loanId}`, timestamp, nftClassId, nftItemId, poolId, false, LoanStatus.CREATED)
 
-    loan.outstandingPrincipal= BigInt(0)
-    loan.outstandingInterest= BigInt(0)
-    loan.outstandingDebt= BigInt(0)
-    loan.presentValue= BigInt(0)
-    loan.writeOffPercentage= BigInt(0)
-    loan.totalBorrowed= BigInt(0)
-    loan.totalRepaid= BigInt(0)
-    loan.totalRepaidPrincipal= BigInt(0)
-    loan.totalRepaidInterest= BigInt(0)
-    loan.totalRepaidUnscheduled= BigInt(0)
+    loan.outstandingPrincipal = BigInt(0)
+    loan.outstandingInterest = BigInt(0)
+    loan.outstandingDebt = BigInt(0)
+    loan.presentValue = BigInt(0)
+    loan.writeOffPercentage = BigInt(0)
+    loan.totalBorrowed = BigInt(0)
+    loan.totalRepaid = BigInt(0)
+    loan.totalRepaidPrincipal = BigInt(0)
+    loan.totalRepaidInterest = BigInt(0)
+    loan.totalRepaidUnscheduled = BigInt(0)
 
     return loan
   }
