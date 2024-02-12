@@ -1,4 +1,5 @@
-import { LoanService } from './loanService'
+import { AssetType, AssetValuationMethod } from '../../types'
+import { AssetService } from './assetService'
 
 const poolId = '1111111111'
 const loanId = 'ABCD'
@@ -15,7 +16,16 @@ api.query['uniques'] = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
 
-const loan = LoanService.init(poolId, loanId, nftClassId, nftItemId, timestamp)
+//TODO: fix test initialisation
+const loan = AssetService.init(
+  poolId,
+  loanId,
+  AssetType.OffchainCash,
+  AssetValuationMethod.Cash,
+  nftClassId,
+  nftItemId,
+  timestamp
+)
 
 describe('Given a new loan, when initialised', () => {
   test('then type is inactive', () => {
