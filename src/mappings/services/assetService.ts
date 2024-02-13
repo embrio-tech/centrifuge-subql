@@ -16,13 +16,11 @@ export class AssetService extends Asset {
     timestamp: Date
   ) {
     logger.info(`Initialising asset ${assetId} for pool ${poolId}`)
-    const isCash = false //TODO: isCash logic derive
     const isActive = false
     const asset = new this(
       `${poolId}-${assetId}`,
       timestamp,
       type,
-      isCash,
       valuationMethod,
       nftClassId,
       nftItemId,
