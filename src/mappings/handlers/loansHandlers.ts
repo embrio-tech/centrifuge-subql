@@ -27,14 +27,15 @@ async function _handleLoanCreated(event: SubstrateEvent<LoanCreatedEvent>) {
 
   const account = await AccountService.getOrInit(event.extrinsic.extrinsic.signer.toHex())
 
-  const internalLoanPricing = loanInfo.pricing.isInternal ? loanInfo.pricing.asInternal : null
+  const isInternal = loanInfo.pricing.isInternal
+  const internalLoanPricing = isInternal ? loanInfo.pricing.asInternal : null
 
   const assetType: AssetType =
-    !!internalLoanPricing && internalLoanPricing.valuationMethod.isCash ? AssetType.OffchainCash : AssetType.Other
+    isInternal && internalLoanPricing.valuationMethod.isCash ? AssetType.OffchainCash : AssetType.Other
 
-  const valuationMethod: AssetValuationMethod = !internalLoanPricing
-    ? AssetValuationMethod.Oracle
-    : AssetValuationMethod[internalLoanPricing.valuationMethod.type]
+  const valuationMethod: AssetValuationMethod = isInternal
+    ? AssetValuationMethod[internalLoanPricing.valuationMethod.type]
+    : AssetValuationMethod.Oracle
 
   const asset = await AssetService.init(
     poolId.toString(),
