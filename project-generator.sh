@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cat > subquery-multichain.yaml <<"EOF"
 specVersion: 1.0.0
 query:
