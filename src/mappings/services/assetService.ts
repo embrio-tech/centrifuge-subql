@@ -22,12 +22,13 @@ export class AssetService extends Asset {
       timestamp,
       type,
       valuationMethod,
-      nftClassId,
-      nftItemId,
       poolId,
       isActive,
       AssetStatus.CREATED
     )
+
+    asset.collateralNftClassId = nftClassId
+    asset.collateralNftItemId = nftItemId
 
     asset.outstandingPrincipal = BigInt(0)
     asset.outstandingInterest = BigInt(0)
