@@ -1,7 +1,14 @@
 import { Option, u128, Vec } from '@polkadot/types'
 import { bnToBn, nToBigInt } from '@polkadot/util'
 import { paginatedGetter } from '../../helpers/paginatedGetter'
-import { ExtendedCall, ExtendedRpc, NavDetails, PoolDetails, PoolMetadata, TrancheDetails } from '../../helpers/types'
+import {
+  ExtendedCall,
+  ExtendedRpc,
+  PoolDetails,
+  PoolMetadata,
+  PoolNav,
+  TrancheDetails,
+} from '../../helpers/types'
 import { Pool } from '../../types'
 
 export class PoolService extends Pool {
@@ -97,6 +104,7 @@ export class PoolService extends Pool {
   }
 
   static async getActivePools() {
+    logger.info('Fetching active pools')
     const pools = (await paginatedGetter('Pool', 'isActive', true)) as PoolService[]
     return pools.map((pool) => this.create(pool) as PoolService)
   }
@@ -114,8 +122,13 @@ export class PoolService extends Pool {
   }
 
   public async updatePortfolioValuation() {
-    const navResponse = await api.query.loans.portfolioValuation<NavDetails>(this.id)
-    this.portfolioValuation = navResponse.value.toBigInt()
+    logger.info(`Updating portfolio valuation for pool: ${this.id}`)
+    const apiCall = api.call as ExtendedCall
+    logger.info(JSON.stringify(apiCall.poolsApi))
+    const navResponse = await apiCall.poolsApi.nav(this.id)
+    this.portfolioValuation = navResponse
+      .unwrapOr<Pick<PoolNav, 'total'>>({ total: api.registry.createType('Balance', 0) })
+      .total.toBigInt()
     return this
   }
 

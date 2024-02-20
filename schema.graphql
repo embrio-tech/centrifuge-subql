@@ -447,3 +447,24 @@ type CurrencyBalance @entity {
 type Blockchain @entity {
   id: ID! #EVM chainId
 }
+
+enum FeeTransactionType {
+  CREATED
+  REMOVED
+  CHARGED
+  ACCRUED
+  PAID
+}
+
+type FeeTransaction @entity {
+  id: ID! # fee id - timestamp
+  timestamp: Date!
+  pool: Pool! @index
+
+  epochNumber: Int!
+  epoch: Epoch! @index
+  type: FeeTransactionType!
+
+  # applies to all CHARGED, ACCRUED and PAID transactions
+  amount: BigInt
+}

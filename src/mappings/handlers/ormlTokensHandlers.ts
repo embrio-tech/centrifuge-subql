@@ -16,7 +16,6 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
   // Skip token transfers from and to excluded addresses
   const fromAddress = String.fromCharCode(...from.toU8a())
   const toAddress = String.fromCharCode(...to.toU8a())
-  logger.info(`fromAddress: ${fromAddress} toAddress: ${toAddress}`)
   const isFromExcludedAddress =
     fromAddress.startsWith('pool') || fromAddress.startsWith('invs') || fromAddress.startsWith('domn')
   const isToExcludedAddress =
@@ -37,10 +36,10 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
   // TRANCHE TOKEN TRANSFERS BETWEEN INVESTORS
   if (_currency.isTranche && !isFromExcludedAddress && !isToExcludedAddress) {
     const pool = await PoolService.getById(_currency.asTranche[0].toString())
-    if(!pool) throw missingPool
+    if (!pool) throw missingPool
 
     const tranche = await TrancheService.getById(pool.id, _currency.asTranche[1].toString())
-    if(!tranche) throw missingPool
+    if (!tranche) throw missingPool
 
     logger.info(
       `Tranche Token transfer between investors tor tranche: ${pool.id}-${tranche.trancheId}. ` +
@@ -99,7 +98,10 @@ async function _handleTokenDeposited(event: SubstrateEvent<TokensEndowedDeposite
     `Currency deposit in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const blockchain = await BlockchainService.getOrInit()
+  const addressChainId = AccountService.isEvm(address.toHex())
+    ? AccountService.readEvmChainId(address.toHex())
+    : undefined
+  const blockchain = await BlockchainService.getOrInit(addressChainId)
   const currency = await CurrencyService.getOrInit(
     blockchain.id,
     _currency.type,
