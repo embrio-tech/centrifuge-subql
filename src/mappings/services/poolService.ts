@@ -4,6 +4,7 @@ import { paginatedGetter } from '../../helpers/paginatedGetter'
 import {
   ExtendedCall,
   ExtendedRpc,
+  NavDetails,
   PoolDetails,
   PoolMetadata,
   PoolNav,
@@ -121,8 +122,26 @@ export class PoolService extends Pool {
     return this
   }
 
-  public async updatePortfolioValuation() {
-    logger.info(`Updating portfolio valuation for pool: ${this.id}`)
+  public updatePortfolioValuation() {
+    const specVersion = api.runtimeVersion.specVersion.toNumber()
+    const specName = api.runtimeVersion.specName.toString()
+    switch (specName) {
+      case 'centrifuge-devel':
+        return specVersion < 1038 ? this.updatePortfolioValuationQuery() : this.updatePortfolioValuationCall()
+      default:
+        return specVersion < 1025 ? this.updatePortfolioValuationQuery() : this.updatePortfolioValuationCall()
+    }
+  }
+
+  private async updatePortfolioValuationQuery() {
+    logger.info(`Updating portfolio valuation for pool: ${this.id} (state)`)
+    const navResponse = await api.query.loans.portfolioValuation<NavDetails>(this.id)
+    this.portfolioValuation = navResponse.value.toBigInt()
+    return this
+  }
+
+  private async updatePortfolioValuationCall() {
+    logger.info(`Updating portfolio valuation for pool: ${this.id} (runtime)`)
     const apiCall = api.call as ExtendedCall
     logger.info(JSON.stringify(apiCall.poolsApi))
     const navResponse = await apiCall.poolsApi.nav(this.id)
