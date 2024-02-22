@@ -448,23 +448,78 @@ type Blockchain @entity {
   id: ID! #EVM chainId
 }
 
-enum FeeTransactionType {
-  CREATED
+enum PoolFeeStatus {
+  PROPOSED
+  ADDED
   REMOVED
-  CHARGED
-  ACCRUED
-  PAID
 }
 
-type FeeTransaction @entity {
-  id: ID! # fee id - timestamp
-  timestamp: Date!
+enum PoolFeeType {
+  Fixed
+  ChargedUpTo
+}
+
+type PoolFee @entity {
+  id: ID! # poolId - feeId
+  feeId: string!
+  type: PoolFeeType!
+  status: PoolFeeStatus!
+  isActive: Boolean! @index
+
+  createdAt: Date
+  createdAtBlockNumber: Int
+  createdAtEpoch: Int
+
   pool: Pool! @index
 
-  epochNumber: Int!
-  epoch: Epoch! @index
-  type: FeeTransactionType!
+  sumChargedAmount: BigInt #Applies to Fixed ONLY
+  sumAccruedAmount: BigInt #Applies toChargedUpTo ONLY
+  sumPaidAmount: BigInt #Applies to All
+  pendingAmount: BigInt #Applies to All
 
-  # applies to all CHARGED, ACCRUED and PAID transactions
+  sumChargedAmount: BigInt #Applies to Fixed ONLY
+  sumAccruedAmount: BigInt #Applies toChargedUpTo ONLY
+  sumPaidAmount: BigInt #Applies to All
+}
+
+type PoolFeeSnapshot @entity {
+  id: ID! # poolId - feeId - blockNumber
+  feeId: string!
+  poolFee: PoolFee! @index
+
+  timestamp: Date!
+  blockNumber: Int!
+  periodStart: Date! @index
+
+  sumChargedAmount: BigInt #Applies to Fixed ONLY
+  sumAccruedAmount: BigInt #Applies toChargedUpTo ONLY
+  sumPaidAmount: BigInt #Applies to All
+  pendingAmount: BigInt #Applies to All
+
+  sumChargedAmount: BigInt #Applies to Fixed ONLY
+  sumAccruedAmount: BigInt #Applies toChargedUpTo ONLY
+  sumPaidAmount: BigInt #Applies to All
+}
+
+enum PoolFeeTransactionType {
+  PROPOSED
+  ADDED
+  REMOVED
+  CHARGED
+  UNCHARGED
+  PAID
+  ACCRUED
+}
+
+type PoolFeeTransaction @entity {
+  id: ID! # extrinsicHash - epochNumber  - transaction type
+  poolFee: PoolFee! @index
+  type: PoolFeeTransactionType!
+
+  timestamp: Date!
+  blockNumber: Int!
+  epochNumber: Int!
+
   amount: BigInt
+
 }
