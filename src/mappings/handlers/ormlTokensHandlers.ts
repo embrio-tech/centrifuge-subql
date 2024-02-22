@@ -7,7 +7,7 @@ import { CurrencyService, currencyFormatters } from '../services/currencyService
 import { InvestorTransactionService } from '../services/investorTransactionService'
 import { PoolService } from '../services/poolService'
 import { TrancheService } from '../services/trancheService'
-import { BlockchainService } from '../services/blockchainService'
+import { BlockchainService, LOCAL_CHAIN_ID } from '../services/blockchainService'
 
 export const handleTokenTransfer = errorHandler(_handleTokenTransfer)
 async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>): Promise<void> {
@@ -26,7 +26,7 @@ async function _handleTokenTransfer(event: SubstrateEvent<TokensTransferEvent>):
     AccountService.getOrInit(to.toHex()),
   ])
 
-  const blockchain = await BlockchainService.getOrInit()
+  const blockchain = await BlockchainService.getOrInit(LOCAL_CHAIN_ID)
   const currency = await CurrencyService.getOrInit(
     blockchain.id,
     _currency.type,
@@ -98,16 +98,14 @@ async function _handleTokenDeposited(event: SubstrateEvent<TokensEndowedDeposite
     `Currency deposit in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const addressChainId = AccountService.isEvm(address.toHex())
-    ? AccountService.readEvmChainId(address.toHex())
-    : undefined
-  const blockchain = await BlockchainService.getOrInit(addressChainId)
+  const toAccount = await AccountService.getOrInit(address.toHex())
+  const blockchain = await BlockchainService.getOrInit(LOCAL_CHAIN_ID)
   const currency = await CurrencyService.getOrInit(
     blockchain.id,
     _currency.type,
     ...currencyFormatters[_currency.type](_currency.value)
   )
-  const toAccount = await AccountService.getOrInit(address.toHex())
+
   const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
   await toCurrencyBalance.credit(amount.toBigInt())
   await toCurrencyBalance.save()
@@ -121,13 +119,14 @@ async function _handleTokenWithdrawn(event: SubstrateEvent<TokensEndowedDeposite
     `Currency withdrawal in ${_currency.toString()} for: ${address.toHex()} amount: ${amount.toString()} ` +
       `at block ${event.block.block.header.number.toString()}`
   )
-  const blockchain = await BlockchainService.getOrInit()
+  const blockchain = await BlockchainService.getOrInit(LOCAL_CHAIN_ID)
+  const toAccount = await AccountService.getOrInit(address.toHex())
   const currency = await CurrencyService.getOrInit(
     blockchain.id,
     _currency.type,
     ...currencyFormatters[_currency.type](_currency.value)
   )
-  const toAccount = await AccountService.getOrInit(address.toHex())
+
   const toCurrencyBalance = await CurrencyBalanceService.getOrInit(toAccount.id, currency.id)
   await toCurrencyBalance.debit(amount.toBigInt())
   await toCurrencyBalance.save()
