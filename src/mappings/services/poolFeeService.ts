@@ -77,8 +77,8 @@ export class PoolFeeService extends PoolFee {
 
   public pay(data: Omit<PoolFeeData, 'amount'> & Required<Pick<PoolFeeData, 'amount'>>) {
     if(!this.isActive) throw new Error('Unable to uncharge inactive PolFee')
-    this.sumChargedAmount -= data.amount
-    this.sumChargedAmountByPeriod -= data.amount
+    this.sumPaidAmount += data.amount
+    this.sumPaidAmountByPeriod += data.amount
     return this
   }
 }
