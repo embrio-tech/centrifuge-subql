@@ -369,7 +369,7 @@ export interface PoolFeeType extends Enum {
   type: 'Fixed' | 'ChargedUpTo'
 }
 
-interface PoolFeeInfo extends Struct {
+export interface PoolFeeInfo extends Struct {
   destination: AccountId32
   editor: PoolFeeEditor
   feeType: PoolFeeType

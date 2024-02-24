@@ -7,3 +7,5 @@ network:
 dataSources:
   - kind: substrate/Runtime
     startBlock: 6870 # block first pool was created at
+    filter:
+      modulo: 1000
