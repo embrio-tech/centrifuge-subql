@@ -121,6 +121,9 @@ export interface TokensCurrencyId extends Enum {
   asForeignAsset: u32
   isStaking: boolean
   asStaking: Enum
+  isLocalAsset: boolean;
+  asLocalAsset: u32;
+  type: 'Native' | 'Tranche' | 'Ausd' | 'ForeignAsset' | 'Staking' | 'LocalAsset';
 }
 
 export interface TrancheSolution extends Struct {
