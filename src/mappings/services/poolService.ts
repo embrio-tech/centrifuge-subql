@@ -95,8 +95,7 @@ export class PoolService extends Pool {
   }
 
   static async getById(poolId: string) {
-    const pool = (await this.get(poolId)) as PoolService
-    return pool
+    return this.get(poolId) as Promise<PoolService>
   }
 
   static async getAll() {

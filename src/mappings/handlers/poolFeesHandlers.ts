@@ -1,5 +1,5 @@
 import { SubstrateEvent } from '@subql/types'
-import { errorHandler } from '../../helpers/errorHandler'
+import { errorHandler, missingPool } from '../../helpers/errorHandler'
 import {
   PoolFeesAddedEvent,
   PoolFeesChargedEvent,
@@ -19,9 +19,9 @@ async function _handleFeeProposed(event: SubstrateEvent<PoolFeesProposedEvent>):
     `Fee with id ${feeId.toString(10)} proposed for pool ${poolId.toString(10)} ` +
       `on block ${event.block.block.header.number.toNumber()}`
   )
-  const pool = await PoolService.getById(poolId.toString(10))
+  const pool = await PoolService.getOrSeed(poolId.toString(10))
   const poolFeeData: PoolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
@@ -44,9 +44,9 @@ async function _handleFeeAdded(event: SubstrateEvent<PoolFeesAddedEvent>): Promi
     `Fee with id ${feeId.toString(10)} added for pool ${poolId.toString(10)} ` +
       `on block ${event.block.block.header.number.toNumber()}`
   )
-  const pool = await PoolService.getById(poolId.toString(10))
+  const pool = await PoolService.getOrSeed(poolId.toString(10))
   const poolFeeData: PoolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
@@ -70,8 +70,9 @@ async function _handleFeeRemoved(event: SubstrateEvent<PoolFeesRemovedEvent>): P
       `on block ${event.block.block.header.number.toNumber()}`
   )
   const pool = await PoolService.getById(poolId.toString(10))
+  if (!pool) throw missingPool
   const poolFeeData: PoolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
@@ -94,8 +95,9 @@ async function _handleFeeCharged(event: SubstrateEvent<PoolFeesChargedEvent>): P
       `on block ${event.block.block.header.number.toNumber()}`
   )
   const pool = await PoolService.getById(poolId.toString(10))
+  if (!pool) throw missingPool
   const poolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
@@ -121,8 +123,9 @@ async function _handleFeeUncharged(event: SubstrateEvent<PoolFeesUnchargedEvent>
       `on block ${event.block.block.header.number.toNumber()}`
   )
   const pool = await PoolService.getById(poolId.toString(10))
+  if (!pool) throw missingPool
   const poolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
@@ -148,8 +151,9 @@ async function _handleFeePaid(event: SubstrateEvent<PoolFeesPaidEvent>): Promise
       `on block ${event.block.block.header.number.toNumber()}`
   )
   const pool = await PoolService.getById(poolId.toString(10))
+  if (!pool) throw missingPool
   const poolFeeData = {
-    poolId: poolId.toString(10),
+    poolId: pool.id,
     feeId: feeId.toString(10),
     blockNumber: event.block.block.header.number.toNumber(),
     timestamp: event.block.timestamp,
