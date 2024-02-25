@@ -7,7 +7,7 @@ export class PoolFeeTransactionService extends PoolFeeTransaction {
     const { hash, epochNumber, poolId, feeId, timestamp, blockNumber } = data
     const _type = PoolFeeTransactionType[type]
     return new this(
-      `${hash}-${epochNumber.toString(10)}`,
+      `${hash}-${epochNumber ?? 0}`,
       `${poolId}-${feeId}`,
       _type,
       timestamp,
