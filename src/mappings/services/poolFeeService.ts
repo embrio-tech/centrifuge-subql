@@ -13,6 +13,7 @@ export interface PoolFeeData {
 
 export class PoolFeeService extends PoolFee {
   static init(data: PoolFeeData, type: keyof typeof PoolFeeType, status: keyof typeof PoolFeeStatus) {
+    logger.info(`Initialising PoolFee ${data.feeId}`)
     const { poolId, feeId } = data
     const _type = PoolFeeType[type]
     const _status = PoolFeeStatus[status]
@@ -43,17 +44,20 @@ export class PoolFeeService extends PoolFee {
   }
 
   static async propose(data: PoolFeeData, type: keyof typeof PoolFeeType) {
+    logger.info(`Proposing PoolFee ${data.feeId}`)
     const poolFee = this.init(data, type, 'PROPOSED')
     return poolFee
   }
 
   static async add(data: PoolFeeData, type: keyof typeof PoolFeeType) {
+    logger.info(`Adding PoolFee ${data.feeId}`)
     const poolFee = await this.getOrInit(data, type, 'ADDED')
     poolFee.isActive = true
     return poolFee
   }
 
   static async delete(data: PoolFeeData) {
+    logger.info(`Removing PoolFee ${data.feeId}`)
     const { poolId, feeId } = data
     const poolFee = await this.get(`${poolId}-${feeId}`)
     if(!poolFee) throw new Error('Unable to remove PoolFee. PoolFee does not exist.')
@@ -62,6 +66,7 @@ export class PoolFeeService extends PoolFee {
   }
 
   public charge(data: Omit<PoolFeeData, 'amount'> & Required<Pick<PoolFeeData, 'amount'>>) {
+    logger.info(`Charging PoolFee ${data.feeId} with amount ${data.amount.toString(10)}`)
     if(!this.isActive) throw new Error('Unable to charge inactive PolFee')
     this.sumChargedAmount += data.amount
     this.sumChargedAmountByPeriod += data.amount
@@ -69,6 +74,7 @@ export class PoolFeeService extends PoolFee {
   }
 
   public uncharge(data: Omit<PoolFeeData, 'amount'> & Required<Pick<PoolFeeData, 'amount'>>) {
+    logger.info(`Uncharging PoolFee ${data.feeId} with amount ${data.amount.toString(10)}`)
     if(!this.isActive) throw new Error('Unable to uncharge inactive PolFee')
     this.sumChargedAmount -= data.amount
     this.sumChargedAmountByPeriod -= data.amount
@@ -76,7 +82,8 @@ export class PoolFeeService extends PoolFee {
   }
 
   public pay(data: Omit<PoolFeeData, 'amount'> & Required<Pick<PoolFeeData, 'amount'>>) {
-    if(!this.isActive) throw new Error('Unable to uncharge inactive PolFee')
+    logger.info(`Paying PoolFee ${data.feeId} with amount ${data.amount.toString(10)}`)
+    if(!this.isActive) throw new Error('Unable to payinactive PolFee')
     this.sumPaidAmount += data.amount
     this.sumPaidAmountByPeriod += data.amount
     return this
