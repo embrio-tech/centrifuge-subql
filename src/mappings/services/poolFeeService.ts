@@ -73,6 +73,7 @@ export class PoolFeeService extends PoolFee {
     if (!this.isActive) throw new Error('Unable to charge inactive PolFee')
     this.sumChargedAmount += data.amount
     this.sumChargedAmountByPeriod += data.amount
+    this.pendingAmount += data.amount
     return this
   }
 
@@ -81,6 +82,7 @@ export class PoolFeeService extends PoolFee {
     if (!this.isActive) throw new Error('Unable to uncharge inactive PolFee')
     this.sumChargedAmount -= data.amount
     this.sumChargedAmountByPeriod -= data.amount
+    this.pendingAmount -= data.amount
     return this
   }
 
@@ -89,6 +91,7 @@ export class PoolFeeService extends PoolFee {
     if (!this.isActive) throw new Error('Unable to payinactive PolFee')
     this.sumPaidAmount += data.amount
     this.sumPaidAmountByPeriod += data.amount
+    this.pendingAmount -= data.amount
     return this
   }
 
@@ -97,9 +100,9 @@ export class PoolFeeService extends PoolFee {
       `Accruing PoolFee ${this.id} with amounts pending: ${pending.toString(10)} ` +
         `disbursement: ${disbursement.toString(10)}`
     )
-    this.pendingAmount = pending
+    this.pendingAmount = pending + disbursement
 
-    const newAccruedAmount = pending + disbursement
+    const newAccruedAmount = this.pendingAmount
     this.sumAccruedAmountByPeriod = newAccruedAmount - this.sumAccruedAmount
     this.sumAccruedAmount = newAccruedAmount
     return this
