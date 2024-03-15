@@ -19,6 +19,11 @@ const definitions: OverrideBundleDefinition = {
           reserve: 'Balance',
           total: 'Balance',
         },
+        PoolFeesOfBucket: {
+          bucket: 'CfgTraitsFeePoolFeeBucket',
+          fees: ' Vec<CfgTypesPoolsPoolFee>',
+        },
+        PoolFeesList: 'Vec<PoolFeesOfBucket>',
       },
     },
   ],
@@ -51,7 +56,7 @@ const definitions: OverrideBundleDefinition = {
             type: 'Option<PalletLoansEntitiesLoansActiveLoan>',
           },
         },
-        version: 1,
+        version: 2,
       },
     ],
     PoolsApi: [
@@ -66,6 +71,23 @@ const definitions: OverrideBundleDefinition = {
               },
             ],
             type: 'Option<PoolNav>',
+          },
+        },
+        version: 1,
+      },
+    ],
+    PoolFeesApi: [
+      {
+        methods: {
+          list_fees: {
+            description: 'Query pool fees status for a pool',
+            params: [
+              {
+                name: 'pool_id',
+                type: 'u64',
+              },
+            ],
+            type: 'Option<PoolFeesList>',
           },
         },
         version: 1,
