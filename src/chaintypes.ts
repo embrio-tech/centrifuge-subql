@@ -139,6 +139,10 @@ const definitions: OverrideBundleDefinition = {
   },
 }
 
+// Fix for LoansApi old runtime v1
+const loansApiRuntime = definitions['runtime']['LoansApi']
+loansApiRuntime.push({ ...loansApiRuntime[0], version: 1 })
+
 export default {
   typesBundle: { spec: { 'centrifuge-devel': definitions, altair: definitions, centrifuge: definitions } },
 }
