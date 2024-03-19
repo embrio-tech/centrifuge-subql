@@ -31,6 +31,7 @@ async function _handleFeeProposed(event: SubstrateEvent<PoolFeesProposedEvent>):
   const type = fee.feeType.type
 
   const poolFee = await PoolFeeService.propose(poolFeeData, type)
+  await poolFee.setName(await pool.getIpfsPoolFeeName(poolFee.feeId))
   await poolFee.save()
 
   const poolFeeTransaction = PoolFeeTransactionService.propose(poolFeeData)
@@ -56,6 +57,7 @@ async function _handleFeeAdded(event: SubstrateEvent<PoolFeesAddedEvent>): Promi
   const type = fee.feeType.type
 
   const poolFee = await PoolFeeService.add(poolFeeData, type)
+  await poolFee.setName(await pool.getIpfsPoolFeeName(poolFee.feeId))
   await poolFee.save()
 
   const poolFeeTransaction = PoolFeeTransactionService.add(poolFeeData)
