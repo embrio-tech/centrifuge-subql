@@ -1,4 +1,4 @@
-import { AssetStatus, AssetType, AssetValuationMethod } from '../../types'
+import { Asset, AssetSnapshot, AssetStatus, AssetType, AssetValuationMethod, Pool, PoolSnapshot } from '../../types'
 import { EthereumBlock } from '@subql/types-ethereum'
 import { DAIMainnetAddress, multicallAddress, tinlakePools } from '../../config'
 import { errorHandler } from '../../helpers/errorHandler'
@@ -45,7 +45,7 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
     const poolUpdateCalls: PoolMulticall[] = []
     for (const tinlakePool of tinlakePools) {
       if (block.number >= tinlakePool.startBlock) {
-        const pool = await PoolService.getOrSeed(tinlakePool.id)
+        const pool = await PoolService.getOrSeed(tinlakePool.id, false,  blockchain.id)
 
         // initialize new pool
         if (block.number >= tinlakePool.startBlock && pool.totalReserve == null) {
@@ -86,12 +86,11 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
     }
     if (poolUpdateCalls.length > 0) {
       const callResults = await processCalls(poolUpdateCalls)
-      for (let i = 0; i < callResults.length; i++) {
-        const callResult = callResults[i]
+      for (const callResult of callResults) {
         const tinlakePool = tinlakePools.find((p) => p.id === callResult.id)
         const latestNavFeed = getLatestContract(tinlakePool?.navFeed, blockNumber)
         const latestReserve = getLatestContract(tinlakePool?.reserve, blockNumber)
-        const pool = await PoolService.getOrSeed(tinlakePool?.id as string)
+        const pool = await PoolService.getOrSeed(tinlakePool?.id, false, blockchain.id)
 
         // Update pool
         if (callResult.type === 'currentNAV' && latestNavFeed) {
@@ -114,7 +113,7 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
         }
 
         // Update loans
-        if (latestNavFeed) {
+        if (latestNavFeed && date.toDateString() === (new Date()).toDateString()) {
           await updateLoans(
             tinlakePool?.id as string,
             date,
@@ -127,8 +126,8 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
     }
 
     // Take snapshots
-    await evmStateSnapshotter('Pool', 'PoolSnapshot', block, 'poolId')
-    await evmStateSnapshotter('Asset', 'AssetSnapshot', block, 'assetId', 'isActive', true)
+    await evmStateSnapshotter<Pool,PoolSnapshot>('Pool', 'PoolSnapshot', block, 'isActive', true, 'poolId')
+    await evmStateSnapshotter<Asset,AssetSnapshot>('Asset', 'AssetSnapshot', block, 'isActive', true, 'assetId')
 
     //Update tracking of period and continue
     await (await timekeeper).update(blockPeriodStart)

@@ -15,15 +15,15 @@ import { Pool } from '../../types'
 import { cid, readIpfs } from '../../helpers/ipfsFetch'
 
 export class PoolService extends Pool {
-  static seed(poolId: string) {
+  static seed(poolId: string, blockchain = '0') {
     logger.info(`Seeding pool ${poolId}`)
-    return new this(`${poolId}`, 'ALL', false)
+    return new this(`${poolId}`, blockchain, 'ALL', false)
   }
 
-  static async getOrSeed(poolId: string, saveSeed = true) {
+  static async getOrSeed(poolId: string, saveSeed = true, blockchain = '0') {
     let pool = await this.getById(poolId)
     if (!pool) {
-      pool = this.seed(poolId)
+      pool = this.seed(poolId, blockchain)
       if (saveSeed) await pool.save()
     }
     return pool
@@ -119,13 +119,13 @@ export class PoolService extends Pool {
   }
 
   static async getAll() {
-    const pools = (await paginatedGetter('Pool', 'type', 'ALL')) as PoolService[]
+    const pools = (await paginatedGetter('Pool', [['type', '=','ALL']])) as PoolService[]
     return pools.map((pool) => this.create(pool) as PoolService)
   }
 
   static async getActivePools() {
     logger.info('Fetching active pools')
-    const pools = (await paginatedGetter('Pool', 'isActive', true)) as PoolService[]
+    const pools = (await paginatedGetter('Pool', [['isActive', '=' ,true]])) as PoolService[]
     return pools.map((pool) => this.create(pool) as PoolService)
   }
 

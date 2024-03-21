@@ -8,6 +8,16 @@ import { TrancheService } from '../services/trancheService'
 import { AssetService } from '../services/assetService'
 import { PoolFeeService } from '../services/poolFeeService'
 import { PoolFeeTransactionService } from '../services/poolFeeTransactionService'
+import {
+  Asset,
+  AssetSnapshot,
+  Pool,
+  PoolFee,
+  PoolFeeSnapshot,
+  PoolSnapshot,
+  Tranche,
+  TrancheSnapshot,
+} from '../../types/models'
 
 const timekeeper = TimekeeperService.init()
 
@@ -85,10 +95,24 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
     }
 
     //Perform Snapshots and reset accumulators
-    await substrateStateSnapshotter('Pool', 'PoolSnapshot', block, 'poolId', 'isActive', true)
-    await substrateStateSnapshotter('Tranche', 'TrancheSnapshot', block, 'trancheId', 'isActive', true)
-    await substrateStateSnapshotter('Asset', 'AssetSnapshot', block, 'assetId', 'isActive', true)
-    await substrateStateSnapshotter('PoolFee', 'PoolFeeSnapshot', block, 'poolFeeId', 'isActive', true)
+    await substrateStateSnapshotter<Pool, PoolSnapshot>('Pool', 'PoolSnapshot', block, 'isActive', true, 'poolId')
+    await substrateStateSnapshotter<Tranche, TrancheSnapshot>(
+      'Tranche',
+      'TrancheSnapshot',
+      block,
+      'isActive',
+      true,
+      'trancheId'
+    )
+    await substrateStateSnapshotter<Asset, AssetSnapshot>('Asset', 'AssetSnapshot', block, 'isActive', true, 'assetId')
+    await substrateStateSnapshotter<PoolFee, PoolFeeSnapshot>(
+      'PoolFee',
+      'PoolFeeSnapshot',
+      block,
+      'isActive',
+      true,
+      'poolFeeId'
+    )
 
     //Update tracking of period and continue
     await (await timekeeper).update(blockPeriodStart)

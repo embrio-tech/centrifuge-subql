@@ -12,6 +12,16 @@ const definitions: OverrideBundleDefinition = {
           presentValue: 'Balance',
           outstandingPrincipal: 'Balance',
           outstandingInterest: 'Balance',
+          currentPrice: 'Option<Balance>',
+        },
+        InvestmentPortfolio: {
+          poolCurrencyId: 'CfgTypesTokensCurrencyId',
+          pendingInvestCurrency: 'Balance',
+          claimableTrancheTokens: 'Balance',
+          freeTrancheTokens: 'Balance',
+          reservedTrancheTokens: 'Balance',
+          pendingRedeemTrancheTokens: 'Balance',
+          claimableCurrency: 'Balance',
         },
         PoolNav: {
           navAum: 'Balance',
@@ -19,11 +29,14 @@ const definitions: OverrideBundleDefinition = {
           reserve: 'Balance',
           total: 'Balance',
         },
-        PoolFeesOfBucket: {
-          bucket: 'CfgTraitsFeePoolFeeBucket',
-          fees: ' Vec<CfgTypesPoolsPoolFee>',
-        },
         PoolFeesList: 'Vec<PoolFeesOfBucket>',
+        PoolFeesOfBucket: {
+          bucket: 'PoolFeeBucket',
+          fees: 'Vec<PoolFee>',
+        },
+        PriceCollectionInput: {
+          _enum: ['Empty', 'Custom(BoundedBTreeMap<OracleKey, Balance, MaxActiveLoansPerPool>)', 'FromRegistry'],
+        },
       },
     },
   ],
