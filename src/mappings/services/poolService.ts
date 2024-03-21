@@ -111,6 +111,10 @@ export class PoolService extends Pool {
   public async getIpfsPoolFeeName(poolFeeId: string): Promise<string> {
     if (!this.metadata) return logger.warn('No IPFS metadata')
     const metadata = await readIpfs<PoolIpfsMetadata>(this.metadata.match(cid)[0])
+    if (!metadata.pool.poolFees) {
+      logger.warn('Missing poolFee object in pool metadata!')
+      return null
+    }
     return metadata.pool.poolFees.find((elem) => elem.id.toString(10) === poolFeeId)?.name ?? null
   }
 
@@ -342,7 +346,7 @@ interface PoolIpfsMetadata {
     name: string
     icon: { uri: string; mime: string }
     asset: { class: string; subClass: string }
-    poolFees: Array<{ id: number; name: string }>
+    poolFees?: Array<{ id: number; name: string }>
   }
   [key: string]: unknown
 }

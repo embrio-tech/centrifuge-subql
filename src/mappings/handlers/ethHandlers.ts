@@ -1,4 +1,4 @@
-import { Asset, AssetSnapshot, AssetStatus, AssetType, AssetValuationMethod, Pool, PoolSnapshot } from '../../types'
+import { AssetStatus, AssetType, AssetValuationMethod, Pool, PoolSnapshot } from '../../types'
 import { EthereumBlock } from '@subql/types-ethereum'
 import { DAIMainnetAddress, multicallAddress, tinlakePools } from '../../config'
 import { errorHandler } from '../../helpers/errorHandler'
@@ -112,7 +112,7 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
           logger.info(`Updating pool ${tinlakePool?.id} with totalReserve: ${pool.totalReserve}`)
         }
 
-        // Update loans
+        // Update loans (only index if fully synced)
         if (latestNavFeed && date.toDateString() === (new Date()).toDateString()) {
           await updateLoans(
             tinlakePool?.id as string,
@@ -127,7 +127,7 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
 
     // Take snapshots
     await evmStateSnapshotter<Pool,PoolSnapshot>('Pool', 'PoolSnapshot', block, 'isActive', true, 'poolId')
-    await evmStateSnapshotter<Asset,AssetSnapshot>('Asset', 'AssetSnapshot', block, 'isActive', true, 'assetId')
+    //await evmStateSnapshotter<Asset,AssetSnapshot>('Asset', 'AssetSnapshot', block, 'isActive', true, 'assetId')
 
     //Update tracking of period and continue
     await (await timekeeper).update(blockPeriodStart)
