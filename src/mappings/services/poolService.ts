@@ -1,5 +1,4 @@
 import { Option, u128, Vec } from '@polkadot/types'
-import { bnToBn, nToBigInt } from '@polkadot/util'
 import { paginatedGetter } from '../../helpers/paginatedGetter'
 import {
   ExtendedCall,
@@ -8,11 +7,11 @@ import {
   PoolDetails,
   PoolFeesList,
   PoolMetadata,
-  PoolNav,
   TrancheDetails,
 } from '../../helpers/types'
 import { Pool } from '../../types'
 import { cid, readIpfs } from '../../helpers/ipfsFetch'
+import { PoolProps } from '../../types/models/Pool'
 
 export class PoolService extends Pool {
   static seed(poolId: string, blockchain = '0') {
@@ -123,14 +122,14 @@ export class PoolService extends Pool {
   }
 
   static async getAll() {
-    const pools = (await paginatedGetter('Pool', [['type', '=','ALL']])) as PoolService[]
+    const pools = (await paginatedGetter('Pool', [['type', '=', 'ALL']])) as PoolService[]
     return pools.map((pool) => this.create(pool) as PoolService)
   }
 
-  static async getActivePools() {
+  static async getActivePools(): Promise<PoolService[]> {
     logger.info('Fetching active pools')
-    const pools = (await paginatedGetter('Pool', [['isActive', '=' ,true]])) as PoolService[]
-    return pools.map((pool) => this.create(pool) as PoolService)
+    const pools = (await paginatedGetter<Pool>('Pool', [['isActive', '=', true]]))
+    return pools.map((pool) => this.create(pool as PoolProps)) as PoolService[]
   }
 
   public async updateState() {
@@ -168,10 +167,11 @@ export class PoolService extends Pool {
     logger.info(`Updating portfolio valuation for pool: ${this.id} (runtime)`)
     const apiCall = api.call as ExtendedCall
     const navResponse = await apiCall.poolsApi.nav(this.id)
-    if (navResponse.isEmpty) logger.warn('Empty pv response')
-    this.portfolioValuation = navResponse
-      .unwrapOr<Pick<PoolNav, 'total'>>({ total: api.registry.createType('Balance', 0) })
-      .total.toBigInt()
+    if (navResponse.isEmpty) {
+      logger.warn('Empty pv response')
+      return
+    }
+    this.portfolioValuation = navResponse.unwrap().total.toBigInt()
     logger.info(`portfolio valuation: ${this.portfolioValuation.toString(10)}`)
     return this
   }
@@ -223,20 +223,22 @@ export class PoolService extends Pool {
   }
 
   public computePoolValue() {
-    const nav = bnToBn(this.portfolioValuation)
-    const totalReserve = bnToBn(this.totalReserve)
-    this.value = nToBigInt(nav.add(totalReserve))
+    this.value = this.portfolioValuation + this.totalReserve
+    logger.info(`Updating pool.value: ${this.value}`)
   }
 
   public resetDebtOverdue() {
+    logger.info('Resetting sumDebtOverdue')
     this.sumDebtOverdue = BigInt(0)
   }
 
   public increaseDebtOverdue(amount: bigint) {
+    logger.info(`Increasing sumDebtOverdue by ${amount}`)
     this.sumDebtOverdue += amount
   }
 
   public increaseWriteOff(amount: bigint) {
+    logger.info(`Increasing writeOff by ${amount}`)
     this.sumDebtWrittenOffByPeriod += amount
   }
 

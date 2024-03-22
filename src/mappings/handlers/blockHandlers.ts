@@ -67,7 +67,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
         await loan.updateActiveAssetData(activeLoanData[loanId])
         await loan.save()
 
-        if (loan.actualMaturityDate < block.timestamp) await pool.increaseDebtOverdue(loan.outstandingDebt)
+        if (loan.actualMaturityDate < block.timestamp) pool.increaseDebtOverdue(loan.outstandingDebt)
       }
 
       await pool.updateNumberOfActiveAssets(BigInt(Object.keys(activeLoanData).length))
@@ -78,7 +78,7 @@ async function _handleBlock(block: SubstrateBlock): Promise<void> {
       for (const accruals of accruedFees) {
         const [feeId, pending, disbursement] = accruals
         const poolFee = await PoolFeeService.getById(pool.id, feeId)
-        poolFee.updateAccruals(pending, disbursement)
+        await poolFee.updateAccruals(pending, disbursement)
         await poolFee.save()
 
         const poolFeeTransaction = PoolFeeTransactionService.accrue({

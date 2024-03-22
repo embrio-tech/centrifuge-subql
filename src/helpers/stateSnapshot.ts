@@ -48,6 +48,7 @@ async function stateSnapshotter<T extends SnapshottableEntity, U extends Snapsho
     const propNames = Object.getOwnPropertyNames(stateEntity)
     const propNamesToReset = propNames.filter((propName) => propName.endsWith('ByPeriod')) as ResettableKey[]
     for (const propName of propNamesToReset) {
+      logger.debug(`resetting ${stateModel.toLowerCase()}.${propName} to 0`)
       stateEntity[propName] = BigInt(0)
     }
     entitySaves.push(store.set(stateModel, stateEntity.id, stateEntity))
