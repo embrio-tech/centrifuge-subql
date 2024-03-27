@@ -24,7 +24,7 @@ async function stateSnapshotter<T extends SnapshottableEntity, U extends Snapsho
   filterValue?: T[keyof T],
   fkReferenceName?: ForeignKey,
   blockchainId: T['blockchainId'] = '0'
-): Promise<void> {
+): Promise<void[]> {
   const entitySaves: Promise<void>[] = []
   logger.info(`Performing snapshots of ${stateModel} for blockchainId ${blockchainId}`)
   const stateEntities = (await paginatedGetter<T>(stateModel, [
@@ -54,7 +54,7 @@ async function stateSnapshotter<T extends SnapshottableEntity, U extends Snapsho
     entitySaves.push(store.set(stateModel, stateEntity.id, stateEntity))
     entitySaves.push(store.set(snapshotModel, snapshotEntity.id, snapshotEntity))
   }
-  await Promise.all(entitySaves)
+  return Promise.all(entitySaves)
 }
 export function evmStateSnapshotter<T extends SnapshottableEntity, U extends SnapshottedEntityProps>(
   stateModel: T['_name'],
@@ -63,7 +63,7 @@ export function evmStateSnapshotter<T extends SnapshottableEntity, U extends Sna
   filterKey?: keyof T,
   filterValue?: T[keyof T],
   fkReferenceName?: ForeignKey
-): Promise<void> {
+): Promise<void[]> {
   const formattedBlock = { number: block.number, timestamp: new Date(Number(block.timestamp) * 1000) }
   return stateSnapshotter<T, U>(stateModel, snapshotModel, formattedBlock, filterKey, filterValue, fkReferenceName, '1')
 }
@@ -75,7 +75,7 @@ export function substrateStateSnapshotter<T extends SnapshottableEntity, U exten
   filterKey?: keyof T,
   filterValue?: T[keyof T],
   fkReferenceName?: ForeignKey
-): Promise<void> {
+): Promise<void[]> {
   const formattedBlock = { number: block.block.header.number.toNumber(), timestamp: block.timestamp }
   return stateSnapshotter<T, U>(stateModel, snapshotModel, formattedBlock, filterKey, filterValue, fkReferenceName, '0')
 }

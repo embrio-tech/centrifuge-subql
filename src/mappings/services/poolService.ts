@@ -126,9 +126,9 @@ export class PoolService extends Pool {
     return pools.map((pool) => this.create(pool) as PoolService)
   }
 
-  static async getActivePools(): Promise<PoolService[]> {
+  static async getCfgActivePools(): Promise<PoolService[]> {
     logger.info('Fetching active pools')
-    const pools = (await paginatedGetter<Pool>('Pool', [['isActive', '=', true]]))
+    const pools = (await paginatedGetter<Pool>('Pool', [['isActive', '=', true],['blockchainId', '=', '0']]))
     return pools.map((pool) => this.create(pool as PoolProps)) as PoolService[]
   }
 

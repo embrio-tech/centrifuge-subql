@@ -78,6 +78,7 @@ async function _handlePoolUpdated(event: SubstrateEvent<PoolUpdatedEvent>): Prom
   if (!pool) throw missingPool
 
   await pool.initData()
+  await pool.initIpfsMetadata()
   await pool.save()
 
   // Deactivate active tranches

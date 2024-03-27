@@ -48,10 +48,11 @@ async function _handleEthBlock(block: EthereumBlock): Promise<void> {
         const pool = await PoolService.getOrSeed(tinlakePool.id, false,  blockchain.id)
 
         // initialize new pool
-        if (block.number >= tinlakePool.startBlock && pool.totalReserve == null) {
+        if (!pool.isActive) {
+          pool.name = tinlakePool.shortName
           pool.totalReserve = BigInt(0)
           pool.portfolioValuation = BigInt(0)
-          pool.isActive = false
+          pool.isActive = true
           pool.currencyId = currency.id
           await pool.save()
           logger.info(`Initializing pool ${tinlakePool.id}`)
